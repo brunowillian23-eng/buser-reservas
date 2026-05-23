@@ -3,156 +3,502 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agrupador de Reservas — Buser</title>
+<title>Ferramenta Interna — Buser</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <style>
+  :root {
+    --pink: #AD1457;
+    --pink-dark: #880E4F;
+    --pink-light: #F8BBD9;
+    --pink-bg: #FFF0F6;
+    --gray-bg: #F7F7F8;
+    --gray-border: #E5E5E5;
+    --gray-text: #666;
+    --dark: #1A1A2E;
+    --white: #FFFFFF;
+    --success: #1B7F3A;
+    --danger: #C62828;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; color: #222; min-height: 100vh; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-bg); color: var(--dark); min-height: 100vh; }
 
-  .top-bar { background: #FF6B00; padding: 16px 32px; display: flex; align-items: center; gap: 14px; }
-  .top-bar .icon { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-  .top-bar h1 { color: #fff; font-size: 18px; font-weight: 600; }
-  .top-bar p { color: rgba(255,255,255,0.85); font-size: 13px; }
+  /* NAV */
+  nav {
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    height: 60px;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .nav-logo-mark {
+    width: 36px;
+    height: 36px;
+    background: var(--pink);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-logo span {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--dark);
+    letter-spacing: -0.3px;
+  }
+  .nav-logo span em { color: var(--pink); font-style: normal; }
+  .nav-divider { width: 1px; height: 24px; background: var(--gray-border); }
+  .nav-subtitle { font-size: 13px; color: var(--gray-text); }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--pink-bg);
+    color: var(--pink);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--pink-light);
+    letter-spacing: 0.3px;
+  }
 
-  .container { max-width: 1100px; margin: 0 auto; padding: 28px 24px; }
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--pink-dark) 0%, var(--pink) 60%, #D81B60 100%);
+    padding: 40px 32px 36px;
+    color: var(--white);
+  }
+  .hero-inner { max-width: 1100px; margin: 0 auto; }
+  .hero h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.5px; }
+  .hero p { font-size: 15px; opacity: 0.85; }
+  .hero-tabs {
+    display: flex;
+    gap: 8px;
+    margin-top: 24px;
+  }
+  .hero-tab {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .hero-tab.active, .hero-tab:hover {
+    background: rgba(255,255,255,0.28);
+    border-color: rgba(255,255,255,0.5);
+  }
 
-  .drop-zone { border: 2px dashed #ccc; border-radius: 12px; padding: 48px; text-align: center; cursor: pointer; background: #fff; transition: all 0.2s; margin-bottom: 24px; }
-  .drop-zone:hover, .drop-zone.drag { border-color: #FF6B00; background: #fff8f4; }
-  .drop-zone svg { display: block; margin: 0 auto 14px; color: #aaa; }
-  .drop-zone h2 { font-size: 16px; font-weight: 600; margin-bottom: 6px; color: #333; }
-  .drop-zone p { font-size: 13px; color: #888; margin-bottom: 18px; }
+  /* CONTAINER */
+  .container { max-width: 1100px; margin: 0 auto; padding: 28px 32px; }
 
-  .btn-primary { background: #FF6B00; color: #fff; border: none; padding: 9px 22px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: background 0.15s; }
-  .btn-primary:hover { background: #e05e00; }
-  .btn-primary:disabled { background: #ffb380; cursor: not-allowed; }
-  .btn-secondary { background: #fff; color: #333; border: 1px solid #ddd; padding: 9px 22px; border-radius: 8px; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: background 0.15s; }
-  .btn-secondary:hover { background: #f5f5f5; }
+  /* SECTIONS */
+  .section { display: none; }
+  .section.active { display: block; }
 
-  .config-box { background: #fff; border-radius: 10px; padding: 18px 20px; margin-bottom: 20px; border: 1px solid #e8e8e8; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
-  .config-box label { font-size: 12px; color: #666; display: block; margin-bottom: 5px; font-weight: 500; }
-  .config-box select { padding: 7px 10px; border: 1px solid #ddd; border-radius: 7px; font-size: 13px; min-width: 150px; background: #fafafa; }
+  /* CARDS */
+  .card {
+    background: var(--white);
+    border-radius: 14px;
+    border: 1px solid var(--gray-border);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .card-title .icon {
+    width: 36px; height: 36px;
+    background: var(--pink-bg);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .card-title .icon svg { color: var(--pink); }
+  .card-title h2 { font-size: 15px; font-weight: 600; }
+  .card-title p { font-size: 12px; color: var(--gray-text); margin-top: 1px; }
 
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
-  .stat-card { background: #fff; border-radius: 10px; padding: 14px 16px; border: 1px solid #e8e8e8; }
-  .stat-card .label { font-size: 12px; color: #888; margin-bottom: 4px; }
-  .stat-card .value { font-size: 26px; font-weight: 600; color: #222; }
+  /* DROP ZONE */
+  .drop-zone {
+    border: 2px dashed var(--pink-light);
+    border-radius: 10px;
+    padding: 36px;
+    text-align: center;
+    cursor: pointer;
+    background: var(--pink-bg);
+    transition: all 0.2s;
+  }
+  .drop-zone:hover, .drop-zone.drag {
+    border-color: var(--pink);
+    background: #FCE4EC;
+  }
+  .drop-zone h3 { font-size: 14px; font-weight: 600; color: var(--dark); margin-bottom: 5px; }
+  .drop-zone p { font-size: 12px; color: var(--gray-text); margin-bottom: 16px; }
 
-  .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
-  .actions input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; min-width: 200px; }
+  /* BUTTONS */
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 20px; border-radius: 9px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    border: none; transition: all 0.15s;
+    text-decoration: none;
+  }
+  .btn-pink { background: var(--pink); color: #fff; }
+  .btn-pink:hover { background: var(--pink-dark); }
+  .btn-pink:disabled { background: var(--pink-light); color: #fff; cursor: not-allowed; }
+  .btn-outline {
+    background: var(--white); color: var(--dark);
+    border: 1px solid var(--gray-border);
+  }
+  .btn-outline:hover { background: var(--gray-bg); border-color: #ccc; }
 
-  #export-area { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e0e0e0; }
-  .export-header { background: #FF6B00; padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
-  .export-header .eh-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-  .export-header h2 { color: #fff; font-size: 15px; font-weight: 600; }
-  .export-header p { color: rgba(255,255,255,0.85); font-size: 12px; margin-top: 2px; }
+  /* SELECTS CONFIG */
+  .config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .config-grid label { font-size: 11px; font-weight: 600; color: var(--gray-text); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .config-grid select {
+    width: 100%; padding: 8px 10px;
+    border: 1px solid var(--gray-border); border-radius: 8px;
+    font-size: 13px; background: var(--gray-bg);
+    color: var(--dark);
+  }
+
+  /* STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .stat-card .lbl { font-size: 11px; color: var(--gray-text); font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; }
+  .stat-card .val { font-size: 28px; font-weight: 700; color: var(--pink); margin-top: 2px; }
+
+  /* ACTIONS BAR */
+  .actions-bar {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 16px;
+  }
+  .actions-bar input[type="text"] {
+    padding: 8px 12px; border: 1px solid var(--gray-border);
+    border-radius: 9px; font-size: 13px; min-width: 200px;
+    background: var(--white);
+  }
+
+  /* TABLE */
+  #export-area {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--gray-border);
+    background: var(--white);
+  }
+  .export-header {
+    background: var(--pink);
+    padding: 14px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .export-header .eh-icon {
+    width: 34px; height: 34px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .export-header h2 { color: #fff; font-size: 14px; font-weight: 600; }
+  .export-header p { color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 1px; }
 
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead tr { background: #f5f5f5; }
-  thead th { padding: 10px 16px; text-align: left; font-weight: 600; font-size: 11px; color: #555; border-bottom: 1px solid #ddd; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-  tbody td { padding: 9px 16px; border-bottom: 1px solid #eee; }
+  thead tr { background: #FAFAFA; }
+  thead th {
+    padding: 10px 16px; text-align: left;
+    font-weight: 600; font-size: 11px; color: var(--gray-text);
+    border-bottom: 1px solid var(--gray-border);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  tbody td { padding: 9px 16px; border-bottom: 1px solid #F5F5F5; }
 
-  .legend { background: #fff; border-radius: 10px; padding: 14px 18px; border: 1px solid #e8e8e8; margin-top: 16px; }
-  .legend .legend-title { font-size: 12px; color: #777; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.4px; }
-  .legend-items { display: flex; flex-wrap: wrap; gap: 8px; }
-  .legend-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid transparent; }
+  /* LEGEND */
+  .legend-box {
+    background: var(--white); border-radius: 12px;
+    border: 1px solid var(--gray-border);
+    padding: 14px 18px; margin-top: 16px;
+  }
+  .legend-box .legend-lbl {
+    font-size: 11px; font-weight: 600; color: var(--gray-text);
+    text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 10px;
+  }
+  .legend-items { display: flex; flex-wrap: wrap; gap: 7px; }
+  .legend-badge {
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+    border: 1px solid transparent;
+  }
 
-  .toast { position: fixed; bottom: 24px; right: 24px; background: #1a7f3c; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 500; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); z-index: 999; }
-  .toast.error { background: #b91c1c; }
+  /* MERGE FILE LIST */
+  .file-list { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
+  .file-item {
+    background: var(--white); border: 1px solid var(--gray-border);
+    border-radius: 9px; padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    cursor: grab; user-select: none; transition: box-shadow 0.15s;
+  }
+  .file-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.07); border-color: #ccc; }
+  .file-item.dragging { opacity: 0.35; }
+  .file-item.drag-over { border-color: var(--pink); background: var(--pink-bg); }
+  .file-icon {
+    width: 32px; height: 32px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+  .file-icon.pdf { background: #FFEBEE; color: var(--danger); }
+  .file-icon.img { background: #E3F2FD; color: #1565C0; }
+  .file-name { flex: 1; font-size: 13px; color: var(--dark); }
+  .file-size { font-size: 11px; color: #bbb; }
+  .btn-remove {
+    background: none; border: none; cursor: pointer;
+    color: #ccc; font-size: 18px; line-height: 1; padding: 0 4px;
+  }
+  .btn-remove:hover { color: var(--danger); }
+  .drag-handle { color: #ccc; cursor: grab; font-size: 15px; }
+
+  .progress-wrap {
+    height: 5px; background: var(--gray-border);
+    border-radius: 3px; overflow: hidden; display: none; margin: 12px 0;
+  }
+  .progress-bar { height: 100%; background: var(--pink); width: 0%; transition: width 0.2s; border-radius: 3px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--success); color: #fff;
+    padding: 12px 18px; border-radius: 10px;
+    font-size: 13px; font-weight: 500;
+    display: none; align-items: center; gap: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 999;
+  }
+  .toast.error { background: var(--danger); }
 
   .hidden { display: none !important; }
+
+  /* SECTION TABS */
+  .tab-panels { }
 </style>
 </head>
 <body>
 
-<div class="top-bar">
-  <div class="icon">
-    <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8l5 4-5 4"/><circle cx="5.5" cy="18.5" r="1.5"/><circle cx="14.5" cy="18.5" r="1.5"/></svg>
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-mark">
+      <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+        <rect x="1" y="3" width="15" height="13" rx="2"/>
+        <path d="M16 8l5 4-5 4"/>
+        <circle cx="5.5" cy="18.5" r="1.5"/>
+        <circle cx="14.5" cy="18.5" r="1.5"/>
+      </svg>
+    </div>
+    <span>bu<em>ser</em></span>
   </div>
-  <div>
-    <h1>Agrupador de Reservas</h1>
-    <p>Buser — identifique grupos na mesma reserva e exporte como imagem</p>
+  <div class="nav-divider"></div>
+  <span class="nav-subtitle">ferramentas internas</span>
+  <span class="nav-badge">USO INTERNO</span>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <h1>Central de Operações</h1>
+    <p>Gerencie passageiros, agrupe reservas e organize passagens em um só lugar.</p>
+    <div class="hero-tabs">
+      <button class="hero-tab active" onclick="switchTab('reservas', this)">
+        🗂 Agrupar Reservas
+      </button>
+      <button class="hero-tab" onclick="switchTab('passagens', this)">
+        📄 Juntar Passagens
+      </button>
+    </div>
   </div>
 </div>
 
 <div class="container">
 
-  <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-    <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 16V4m0 0L8 8m4-4l4 4"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
-    <h2>Arraste o arquivo XLS/XLSX aqui</h2>
-    <p>ou clique para selecionar do computador</p>
-    <button class="btn-primary" onclick="event.stopPropagation(); document.getElementById('file-input').click()">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      Selecionar arquivo
-    </button>
-    <input type="file" id="file-input" accept=".xlsx,.xls,.csv" style="display:none">
-  </div>
+  <!-- ===== SEÇÃO 1: RESERVAS ===== -->
+  <div id="tab-reservas" class="section active">
 
-  <div class="config-box hidden" id="config-section">
-    <div><label>Coluna do nome</label><select id="col-nome"></select></div>
-    <div><label>Coluna da reserva</label><select id="col-reserva"></select></div>
-    <div><label>Coluna do trecho</label><select id="col-trecho"></select></div>
-    <div><label>Coluna do documento</label><select id="col-documento"></select></div>
-    <button class="btn-primary" onclick="gerarTabela()">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
-      Gerar com cores
-    </button>
-  </div>
-
-  <div class="stats hidden" id="stats-section">
-    <div class="stat-card"><div class="label">Passageiros</div><div class="value" id="stat-passageiros">—</div></div>
-    <div class="stat-card"><div class="label">Reservas únicas</div><div class="value" id="stat-reservas">—</div></div>
-    <div class="stat-card"><div class="label">Grupos (2+ pessoas)</div><div class="value" id="stat-grupos">—</div></div>
-    <div class="stat-card"><div class="label">Viajando sozinhos</div><div class="value" id="stat-solo">—</div></div>
-  </div>
-
-  <div class="actions hidden" id="actions-section">
-    <button class="btn-primary" id="btn-png" onclick="exportarPNG()">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-      Exportar PNG
-    </button>
-    <button class="btn-secondary" id="btn-pdf-lista" onclick="exportarPDF()">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
-      Exportar PDF
-    </button>
-    <button class="btn-secondary" onclick="exportarCSV()">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      Exportar CSV
-    </button>
-    <input type="text" placeholder="Filtrar por trecho, nome..." oninput="filtrarTabela(this.value)" style="padding:8px 12px; border:1px solid #ddd; border-radius:8px; font-size:13px; min-width:220px;">
-  </div>
-
-  <div id="export-area" class="hidden">
-    <div class="export-header">
-      <div class="eh-icon">
-        <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8l5 4-5 4"/><circle cx="5.5" cy="18.5" r="1.5"/><circle cx="14.5" cy="18.5" r="1.5"/></svg>
+    <div class="card">
+      <div class="card-title">
+        <div class="icon">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div>
+          <h2>Importar planilha de passageiros</h2>
+          <p>Formatos aceitos: XLS, XLSX, CSV</p>
+        </div>
       </div>
-      <div>
-        <h2 id="export-title">Lista de Passageiros</h2>
-        <p id="export-subtitle"></p>
+
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <svg width="40" height="40" fill="none" stroke="#AD1457" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="display:block;margin:0 auto 12px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <h3>Arraste a planilha aqui</h3>
+        <p>ou clique para selecionar do computador</p>
+        <input type="file" id="file-input" accept=".xlsx,.xls,.csv" style="display:none">
+        <button class="btn btn-pink" onclick="event.stopPropagation(); document.getElementById('file-input').click()">Selecionar arquivo</button>
       </div>
     </div>
-    <div style="overflow-x:auto;">
-      <table id="result-table">
-        <thead id="table-head"></thead>
-        <tbody id="table-body"></tbody>
-      </table>
+
+    <div class="card hidden" id="config-section">
+      <div class="card-title">
+        <div class="icon">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+        </div>
+        <div>
+          <h2>Configurar colunas</h2>
+          <p>Confirme quais colunas correspondem a cada campo</p>
+        </div>
+      </div>
+      <div class="config-grid">
+        <div><label>Nome do passageiro</label><select id="col-nome"></select></div>
+        <div><label>Código da reserva</label><select id="col-reserva"></select></div>
+        <div><label>Trecho / Rota</label><select id="col-trecho"></select></div>
+        <div><label>Documento (RG/CPF)</label><select id="col-documento"></select></div>
+      </div>
+      <button class="btn btn-pink" onclick="gerarTabela()">Gerar tabela agrupada</button>
     </div>
-  </div>
 
-  <div class="legend hidden" id="legend">
-    <div class="legend-title">Legenda — grupos com 2 ou mais pessoas na mesma reserva</div>
-    <div class="legend-items" id="legend-items"></div>
-  </div>
+    <div class="stats-grid hidden" id="stats-section">
+      <div class="stat-card"><div class="lbl">Passageiros</div><div class="val" id="stat-passageiros">—</div></div>
+      <div class="stat-card"><div class="lbl">Reservas únicas</div><div class="val" id="stat-reservas">—</div></div>
+      <div class="stat-card"><div class="lbl">Grupos (2+)</div><div class="val" id="stat-grupos">—</div></div>
+      <div class="stat-card"><div class="lbl">Sozinhos</div><div class="val" id="stat-solo">—</div></div>
+    </div>
 
-</div>
+    <div class="actions-bar hidden" id="actions-section">
+      <button class="btn btn-pink" id="btn-png" onclick="exportarPNG()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Exportar PNG
+      </button>
+      <button class="btn btn-outline" id="btn-pdf-lista" onclick="exportarPDFLista()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/></svg>
+        Exportar PDF
+      </button>
+      <button class="btn btn-outline" onclick="exportarCSV()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Exportar CSV
+      </button>
+      <input type="text" placeholder="Filtrar por nome, trecho..." oninput="filtrarTabela(this.value)">
+    </div>
+
+    <div id="export-area" class="hidden">
+      <div class="export-header">
+        <div class="eh-icon">
+          <svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8l5 4-5 4"/><circle cx="5.5" cy="18.5" r="1.5"/><circle cx="14.5" cy="18.5" r="1.5"/></svg>
+        </div>
+        <div>
+          <h2 id="export-title">Lista de Passageiros</h2>
+          <p id="export-subtitle"></p>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="result-table">
+          <thead id="table-head"></thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="legend-box hidden" id="legend">
+      <div class="legend-lbl">Legenda — grupos com 2 ou mais pessoas na mesma reserva</div>
+      <div class="legend-items" id="legend-items"></div>
+    </div>
+
+  </div><!-- /tab-reservas -->
+
+  <!-- ===== SEÇÃO 2: JUNTAR PASSAGENS ===== -->
+  <div id="tab-passagens" class="section">
+
+    <div class="card">
+      <div class="card-title">
+        <div class="icon">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        </div>
+        <div>
+          <h2>Juntar passagens em um único PDF</h2>
+          <p>Suba PDFs e imagens, ordene arrastando e baixe tudo em um arquivo só</p>
+        </div>
+      </div>
+
+      <div class="drop-zone" id="merge-drop" onclick="document.getElementById('merge-input').click()">
+        <svg width="40" height="40" fill="none" stroke="#AD1457" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="display:block;margin:0 auto 12px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <h3>Arraste os arquivos aqui</h3>
+        <p>PDF, JPG ou PNG — pode selecionar vários de uma vez</p>
+        <input type="file" id="merge-input" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none">
+        <button class="btn btn-pink" onclick="event.stopPropagation(); document.getElementById('merge-input').click()">Selecionar arquivos</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="merge-card">
+      <div class="card-title">
+        <div class="icon">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </div>
+        <div>
+          <h2>Arquivos selecionados</h2>
+          <p id="merge-count-label">Arraste para reordenar antes de gerar</p>
+        </div>
+      </div>
+
+      <div id="merge-file-list" class="file-list"></div>
+      <div class="progress-wrap" id="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:4px;">
+        <button class="btn btn-pink" id="btn-merge" onclick="juntarPDFs()">Gerar PDF unificado</button>
+        <button class="btn btn-outline" onclick="limparMerge()">Limpar tudo</button>
+        <span style="font-size:12px; color:var(--gray-text);" id="merge-status"></span>
+      </div>
+    </div>
+
+  </div><!-- /tab-passagens -->
+
+</div><!-- /container -->
 
 <div class="toast" id="toast">
-  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-  <span id="toast-text">Imagem salva com sucesso!</span>
+  ✓ <span id="toast-text">Salvo!</span>
 </div>
 
 <script>
+// ===== TAB SWITCH =====
+function switchTab(tab, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('.hero-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ===== RESERVAS =====
 let dadosTabela = [], colunas = [], coloresReserva = {}, nomeArquivo = 'reservas';
 
 const PALETTE = [
@@ -231,9 +577,9 @@ function gerarTabela() {
   document.getElementById('table-body').innerHTML = ordenado.map((row,idx) => {
     const res = String(row[iReserva]||'').trim();
     const ci = coloresReserva[res];
-    const bg = ci !== undefined ? PALETTE[ci] : (idx%2===0?'#fff':'#fafafa');
+    const bg = ci !== undefined ? PALETTE[ci] : (idx%2===0?'#fff':'#FAFAFA');
     const color = ci !== undefined ? PALETTE_TEXT[ci] : '#333';
-    return `<tr style="background:${bg}; border-bottom:1px solid #eee;">
+    return `<tr style="background:${bg}; border-bottom:1px solid #F0F0F0;">
       ${usedCols.map(i=>`<td style="padding:9px 16px;color:${color};font-size:13px;">${row[i]||''}</td>`).join('')}
     </tr>`;
   }).join('');
@@ -244,7 +590,7 @@ function gerarTabela() {
 
   document.getElementById('legend-items').innerHTML = grupos.map(res => {
     const ci = coloresReserva[res];
-    return `<span class="legend-badge" style="background:${PALETTE[ci]};color:${PALETTE_TEXT[ci]};border-color:${PALETTE_TEXT[ci]}33;">${res} (${contagem[res]} pessoas)</span>`;
+    return `<span class="legend-badge" style="background:${PALETTE[ci]};color:${PALETTE_TEXT[ci]};border-color:${PALETTE_TEXT[ci]}33;">${res} (${contagem[res]})</span>`;
   }).join('');
 
   document.getElementById('stat-passageiros').textContent = dadosTabela.length;
@@ -264,25 +610,42 @@ function filtrarTabela(txt) {
 
 function exportarPNG() {
   const btn = document.getElementById('btn-png');
-  btn.disabled = true;
-  btn.innerHTML = '⏳ Gerando imagem...';
+  btn.disabled = true; btn.textContent = 'Gerando...';
+  html2canvas(document.getElementById('export-area'), {scale:2, useCORS:true, backgroundColor:'#fff', logging:false}).then(canvas => {
+    const a = document.createElement('a');
+    const d = new Date().toISOString().slice(0,10);
+    a.download = `reservas_${d}.png`; a.href = canvas.toDataURL('image/png'); a.click();
+    btn.disabled = false; btn.textContent = 'Exportar PNG';
+    mostrarToast(`reservas_${d}.png salvo!`, false);
+  }).catch(() => { btn.disabled = false; btn.textContent = 'Exportar PNG'; mostrarToast('Erro ao gerar PNG.', true); });
+}
 
-  html2canvas(document.getElementById('export-area'), {
-    scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false
-  }).then(canvas => {
-    const link = document.createElement('a');
-    const data = new Date().toISOString().slice(0,10);
-    link.download = `reservas_${data}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    btn.disabled = false;
-    btn.innerHTML = '🖼 Exportar PNG';
-    mostrarToast(`Imagem salva: reservas_${data}.png`, false);
-  }).catch(() => {
-    btn.disabled = false;
-    btn.innerHTML = '🖼 Exportar PNG';
-    mostrarToast('Erro ao gerar imagem. Tente novamente.', true);
-  });
+async function exportarPDFLista() {
+  const btn = document.getElementById('btn-pdf-lista');
+  btn.disabled = true; btn.textContent = 'Gerando...';
+  try {
+    const canvas = await html2canvas(document.getElementById('export-area'), {scale:2, useCORS:true, backgroundColor:'#fff', logging:false});
+    const imgData = canvas.toDataURL('image/png');
+    const { PDFDocument } = PDFLib;
+    const pdfDoc = await PDFDocument.create();
+    const imgBytes = await fetch(imgData).then(r => r.arrayBuffer());
+    const pngImg = await pdfDoc.embedPng(imgBytes);
+    const { width: iw, height: ih } = pngImg;
+    const pageW = 595, pageH = Math.round((ih/iw)*pageW);
+    const page = pdfDoc.addPage([pageW, pageH]);
+    page.drawImage(pngImg, {x:0, y:0, width:pageW, height:pageH});
+    const pdfBytes = await pdfDoc.save();
+    const a = document.createElement('a');
+    const d = new Date().toISOString().slice(0,10);
+    a.download = `reservas_${d}.pdf`;
+    a.href = URL.createObjectURL(new Blob([pdfBytes], {type:'application/pdf'}));
+    a.click();
+    btn.disabled = false; btn.textContent = 'Exportar PDF';
+    mostrarToast(`reservas_${d}.pdf salvo!`, false);
+  } catch(err) {
+    btn.disabled = false; btn.textContent = 'Exportar PDF';
+    mostrarToast('Erro: ' + err.message, true);
+  }
 }
 
 function exportarCSV() {
@@ -300,134 +663,15 @@ function exportarCSV() {
   a.download = 'reservas_agrupadas.csv'; a.click();
 }
 
-async function exportarPDF() {
-  const btn = document.getElementById("btn-pdf-lista");
-  btn.disabled = true; btn.innerHTML = "⏳ gerando PDF...";
-  try {
-    const canvas = await html2canvas(document.getElementById("export-area"), {scale:2, useCORS:true, backgroundColor:"#ffffff", logging:false});
-    const imgData = canvas.toDataURL("image/png");
-    const { PDFDocument } = PDFLib;
-    const pdfDoc = await PDFDocument.create();
-    const imgBytes = await fetch(imgData).then(r => r.arrayBuffer());
-    const pngImg = await pdfDoc.embedPng(imgBytes);
-    const { width: iw, height: ih } = pngImg;
-    const pageW = 595, pageH = Math.round((ih / iw) * pageW);
-    const page = pdfDoc.addPage([pageW, pageH]);
-    page.drawImage(pngImg, {x:0, y:0, width:pageW, height:pageH});
-    const pdfBytes = await pdfDoc.save();
-    const a = document.createElement("a");
-    const data = new Date().toISOString().slice(0,10);
-    a.download = "reservas_" + data + ".pdf";
-    a.href = URL.createObjectURL(new Blob([pdfBytes], {type:"application/pdf"}));
-    a.click();
-    btn.disabled = false; btn.innerHTML = "Exportar PDF";
-    mostrarToast("reservas_" + data + ".pdf salvo!", false);
-  } catch(err) {
-    btn.disabled = false; btn.innerHTML = "Exportar PDF";
-    mostrarToast("Erro: " + err.message, true);
-  }
-}
-
-function mostrarToast(msg, erro) {
-  const t = document.getElementById('toast');
-  document.getElementById('toast-text').textContent = msg;
-  t.className = 'toast' + (erro ? ' error' : '');
-  t.style.display = 'flex';
-  setTimeout(() => t.style.display = 'none', 4000);
-}
-</script>
-
-<!-- ===== SEÇÃO: JUNTAR PASSAGENS ===== -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<style>
-  .section-divider { border:none; border-top:2px dashed #e0e0e0; margin:40px 0; }
-  .section-title { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
-  .section-title .icon { width:40px; height:40px; background:#FF6B00; border-radius:50%; display:flex; align-items:center; justify-content:center; }
-  .section-title h2 { font-size:18px; font-weight:600; margin:0; }
-  .section-title p { font-size:13px; color:#888; margin:0; }
-
-  .merge-drop { border:2px dashed #ccc; border-radius:12px; padding:36px; text-align:center; cursor:pointer; background:#fff; transition:all 0.2s; }
-  .merge-drop:hover, .merge-drop.drag { border-color:#FF6B00; background:#fff8f4; }
-  .merge-drop svg { display:block; margin:0 auto 12px; color:#aaa; }
-
-  .file-list { display:flex; flex-direction:column; gap:8px; margin:16px 0; }
-  .file-item { background:#fff; border:1px solid #e8e8e8; border-radius:8px; padding:10px 14px; display:flex; align-items:center; gap:10px; cursor:grab; user-select:none; transition:box-shadow 0.15s; }
-  .file-item:hover { box-shadow:0 2px 8px rgba(0,0,0,0.08); }
-  .file-item.dragging { opacity:0.4; }
-  .file-item.drag-over { border-color:#FF6B00; background:#fff8f4; }
-  .file-item .file-icon { width:32px; height:32px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0; }
-  .file-item .file-icon.pdf { background:#fee2e2; color:#b91c1c; }
-  .file-item .file-icon.img { background:#dbeafe; color:#1d4ed8; }
-  .file-item .file-name { flex:1; font-size:13px; color:#333; }
-  .file-item .file-size { font-size:11px; color:#aaa; }
-  .file-item .btn-remove { background:none; border:none; cursor:pointer; color:#aaa; font-size:18px; line-height:1; padding:0 4px; }
-  .file-item .btn-remove:hover { color:#e53e3e; }
-  .drag-handle { color:#ccc; font-size:16px; cursor:grab; margin-right:2px; }
-
-  .merge-actions { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:8px; }
-  .merge-status { font-size:13px; color:#888; }
-
-  .progress-bar-wrap { height:6px; background:#f0f0f0; border-radius:3px; margin:12px 0; overflow:hidden; display:none; }
-  .progress-bar { height:100%; background:#FF6B00; border-radius:3px; width:0%; transition:width 0.2s; }
-</style>
-
-<div class="container" style="padding-top:0;">
-  <hr class="section-divider">
-
-  <div class="section-title">
-    <div class="icon">
-      <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-    </div>
-    <div>
-      <h2>juntar passagens em um único PDF</h2>
-      <p>suba PDFs e imagens (JPG, PNG), ordene como quiser e baixe tudo em um arquivo só</p>
-    </div>
-  </div>
-
-  <div class="merge-drop" id="merge-drop" onclick="document.getElementById('merge-input').click()">
-    <svg width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-    <h2 style="font-size:15px; margin-bottom:6px;">arraste os arquivos aqui</h2>
-    <p style="font-size:13px; margin-bottom:16px;">PDF, JPG ou PNG — pode selecionar vários de uma vez</p>
-    <input type="file" id="merge-input" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none">
-    <button class="btn-primary" onclick="event.stopPropagation(); document.getElementById('merge-input').click()">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      selecionar arquivos
-    </button>
-  </div>
-
-  <div id="merge-file-list" class="file-list" style="display:none;"></div>
-  <div class="progress-bar-wrap" id="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
-
-  <div class="merge-actions" id="merge-actions" style="display:none;">
-    <button class="btn-primary" id="btn-merge" onclick="juntarPDFs()">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      gerar PDF unificado
-    </button>
-    <button class="btn-secondary" onclick="limparMerge()">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-      limpar tudo
-    </button>
-    <span class="merge-status" id="merge-status"></span>
-  </div>
-
-  <p style="font-size:12px; color:#aaa; margin-top:10px;" id="merge-hint" style="display:none;">
-    💡 arraste os itens da lista para reordenar antes de gerar o PDF
-  </p>
-</div>
-
-<script>
-let mergeFiles = [];
-let dragSrcIndex = null;
+// ===== JUNTAR PASSAGENS =====
+let mergeFiles = [], dragSrcIndex = null;
 
 const mergeInput = document.getElementById('merge-input');
 const mergeDropZone = document.getElementById('merge-drop');
 
 mergeDropZone.addEventListener('dragover', e => { e.preventDefault(); mergeDropZone.classList.add('drag'); });
 mergeDropZone.addEventListener('dragleave', () => mergeDropZone.classList.remove('drag'));
-mergeDropZone.addEventListener('drop', e => {
-  e.preventDefault(); mergeDropZone.classList.remove('drag');
-  adicionarArquivos(Array.from(e.dataTransfer.files));
-});
+mergeDropZone.addEventListener('drop', e => { e.preventDefault(); mergeDropZone.classList.remove('drag'); adicionarArquivos(Array.from(e.dataTransfer.files)); });
 mergeInput.addEventListener('change', e => { adicionarArquivos(Array.from(e.target.files)); e.target.value=''; });
 
 function adicionarArquivos(files) {
@@ -437,70 +681,52 @@ function adicionarArquivos(files) {
 }
 
 function renderizarLista() {
+  const card = document.getElementById('merge-card');
+  if(mergeFiles.length === 0) { card.classList.add('hidden'); return; }
+  card.classList.remove('hidden');
+  document.getElementById('merge-count-label').textContent = `${mergeFiles.length} arquivo(s) · arraste para reordenar`;
   const list = document.getElementById('merge-file-list');
-  const actions = document.getElementById('merge-actions');
-  const hint = document.getElementById('merge-hint');
-
-  if(mergeFiles.length === 0) { list.style.display='none'; actions.style.display='none'; if(hint) hint.style.display='none'; return; }
-
-  list.style.display='flex'; actions.style.display='flex'; if(hint) hint.style.display='block';
-  document.getElementById('merge-status').textContent = `${mergeFiles.length} arquivo(s) — arraste para reordenar`;
-
   list.innerHTML = mergeFiles.map((f,i) => {
     const isPDF = /\.pdf$/i.test(f.name);
     const size = f.size > 1024*1024 ? (f.size/1024/1024).toFixed(1)+'MB' : Math.round(f.size/1024)+'KB';
     return `<div class="file-item" draggable="true" data-index="${i}"
-      ondragstart="dragStart(event,${i})"
-      ondragover="dragOver(event,${i})"
-      ondrop="dropItem(event,${i})"
-      ondragend="dragEnd(event)">
-      <span class="drag-handle" title="arraste para reordenar">⠿</span>
+      ondragstart="dragStart(event,${i})" ondragover="dragOver(event,${i})"
+      ondrop="dropItem(event,${i})" ondragend="dragEnd(event)">
+      <span class="drag-handle">⠿</span>
       <div class="file-icon ${isPDF?'pdf':'img'}">${isPDF?'PDF':'IMG'}</div>
       <span class="file-name">${f.name}</span>
       <span class="file-size">${size}</span>
-      <button class="btn-remove" onclick="removerArquivo(${i})" title="remover">×</button>
+      <button class="btn-remove" onclick="removerArquivo(${i})">×</button>
     </div>`;
   }).join('');
 }
 
 function removerArquivo(i) { mergeFiles.splice(i,1); renderizarLista(); }
 function limparMerge() { mergeFiles=[]; renderizarLista(); document.getElementById('progress-wrap').style.display='none'; }
-
-function dragStart(e, i) { dragSrcIndex=i; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
-function dragOver(e, i) { e.preventDefault(); document.querySelectorAll('.file-item').forEach(el=>el.classList.remove('drag-over')); if(i!==dragSrcIndex) e.currentTarget.classList.add('drag-over'); }
-function dropItem(e, i) {
-  e.preventDefault();
-  if(dragSrcIndex===null || dragSrcIndex===i) return;
-  const moved = mergeFiles.splice(dragSrcIndex,1)[0];
-  mergeFiles.splice(i,0,moved);
-  dragSrcIndex=null;
-  renderizarLista();
-}
+function dragStart(e,i) { dragSrcIndex=i; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
+function dragOver(e,i) { e.preventDefault(); document.querySelectorAll('.file-item').forEach(el=>el.classList.remove('drag-over')); if(i!==dragSrcIndex) e.currentTarget.classList.add('drag-over'); }
+function dropItem(e,i) { e.preventDefault(); if(dragSrcIndex===null||dragSrcIndex===i) return; const m=mergeFiles.splice(dragSrcIndex,1)[0]; mergeFiles.splice(i,0,m); dragSrcIndex=null; renderizarLista(); }
 function dragEnd(e) { e.target.classList.remove('dragging'); document.querySelectorAll('.file-item').forEach(el=>el.classList.remove('drag-over')); }
 
 async function juntarPDFs() {
-  if(mergeFiles.length===0) return;
+  if(!mergeFiles.length) return;
   const btn = document.getElementById('btn-merge');
-  const progressWrap = document.getElementById('progress-wrap');
-  const progressBar = document.getElementById('progress-bar');
-  const status = document.getElementById('merge-status');
-
-  btn.disabled=true; btn.innerHTML='⏳ processando...';
-  progressWrap.style.display='block'; progressBar.style.width='0%';
-
+  const pw = document.getElementById('progress-wrap');
+  const pb = document.getElementById('progress-bar');
+  const st = document.getElementById('merge-status');
+  btn.disabled=true; btn.textContent='Processando...';
+  pw.style.display='block'; pb.style.width='0%';
   try {
     const { PDFDocument } = PDFLib;
     const finalPdf = await PDFDocument.create();
-
     for(let i=0; i<mergeFiles.length; i++) {
       const file = mergeFiles[i];
       const buf = await file.arrayBuffer();
-      progressBar.style.width = Math.round((i/mergeFiles.length)*80)+'%';
-      status.textContent = `processando ${i+1}/${mergeFiles.length}: ${file.name}`;
-
+      pb.style.width = Math.round((i/mergeFiles.length)*85)+'%';
+      st.textContent = `Processando ${i+1}/${mergeFiles.length}...`;
       if(/\.pdf$/i.test(file.name)) {
-        const srcPdf = await PDFDocument.load(buf, {ignoreEncryption:true});
-        const pages = await finalPdf.copyPages(srcPdf, srcPdf.getPageIndices());
+        const src = await PDFDocument.load(buf, {ignoreEncryption:true});
+        const pages = await finalPdf.copyPages(src, src.getPageIndices());
         pages.forEach(p => finalPdf.addPage(p));
       } else {
         const isJpeg = /\.jpe?g$/i.test(file.name);
@@ -509,32 +735,33 @@ async function juntarPDFs() {
         page.drawImage(img, {x:0, y:0, width:img.width, height:img.height});
       }
     }
-
-    progressBar.style.width='95%';
-    status.textContent = 'finalizando...';
-
+    pb.style.width='95%'; st.textContent='Finalizando...';
     const pdfBytes = await finalPdf.save();
-    const blob = new Blob([pdfBytes], {type:'application/pdf'});
+    const d = new Date().toISOString().slice(0,10);
     const a = document.createElement('a');
-    const data = new Date().toISOString().slice(0,10);
-    a.download = `passagens_${data}.pdf`;
-    a.href = URL.createObjectURL(blob);
+    a.download = `passagens_${d}.pdf`;
+    a.href = URL.createObjectURL(new Blob([pdfBytes], {type:'application/pdf'}));
     a.click();
-
-    progressBar.style.width='100%';
-    btn.disabled=false;
-    btn.innerHTML='<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> gerar PDF unificado';
-    status.textContent = `✅ PDF gerado com ${mergeFiles.length} arquivo(s)!`;
-    mostrarToast(`passagens_${data}.pdf salvo com sucesso!`, false);
-    setTimeout(()=>{ progressWrap.style.display='none'; progressBar.style.width='0%'; },3000);
-
+    pb.style.width='100%';
+    btn.disabled=false; btn.textContent='Gerar PDF unificado';
+    st.textContent=`✓ PDF gerado com ${mergeFiles.length} arquivo(s)!`;
+    mostrarToast(`passagens_${d}.pdf salvo!`, false);
+    setTimeout(()=>{ pw.style.display='none'; pb.style.width='0%'; },3000);
   } catch(err) {
-    btn.disabled=false;
-    btn.innerHTML='gerar PDF unificado';
-    status.textContent='❌ erro ao processar. verifique os arquivos.';
-    mostrarToast('Erro ao juntar arquivos: '+err.message, true);
-    progressWrap.style.display='none';
+    btn.disabled=false; btn.textContent='Gerar PDF unificado';
+    st.textContent='Erro: '+err.message;
+    mostrarToast('Erro ao juntar arquivos.', true);
+    pw.style.display='none';
   }
+}
+
+// ===== TOAST =====
+function mostrarToast(msg, erro) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = msg;
+  t.className = 'toast' + (erro?' error':'');
+  t.style.display='flex';
+  setTimeout(()=>t.style.display='none', 4000);
 }
 </script>
 </body>
