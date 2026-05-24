@@ -950,9 +950,9 @@ async function exportarXLSX() {
     const temEmail = iEmail >= 0;
 
     const ordenado = [...dadosTabela].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
-    const { reservaParaGrupo, corDoGrupo } = resolverGruposCor(ordenado, iReserva, iEmail);
+    const { reservaParaGrupo, corDoGrupo, contagemGrupo } = resolverGruposCor(ordenado, iReserva, iEmail);
 
-    // Agrupa por trecho
+    // Agrupa por trecho mantendo ordem
     const porTrecho = {};
     const ordemTrecho = [];
     ordenado.forEach(row => {
@@ -961,53 +961,62 @@ async function exportarXLSX() {
       porTrecho[t].push(row);
     });
 
-    const wb = new ExcelJS.Workbook();
+    const wb  = new ExcelJS.Workbook();
     wb.creator = 'Buser';
     wb.created = new Date();
+    const ws  = wb.addWorksheet('Passageiros');
 
-    // Cor rosa Buser para cabeçalhos
-    const PINK_BG   = 'FFAD1457';
-    const PINK_TEXT = 'FFFFFFFF';
-    const PINK_SUB  = 'FFF8BBD9';
-    const PINK_SUB_TEXT = 'FF880E4F';
+    const numCols = temEmail ? 5 : 4;
+    const lastCol = temEmail ? 'E' : 'D';
+
+    // Larguras
+    ws.columns = temEmail
+      ? [{width:38},{width:12},{width:36},{width:30},{width:22}]
+      : [{width:38},{width:12},{width:36},{width:22}];
+
+    const toArgb = hex => 'FF' + hex.replace('#','').toUpperCase();
+
+    // Cabeçalho geral da planilha (rosa Buser)
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    const totalGrupos = Object.values(contagemGrupo).filter(v=>v>1).length;
+    const cabecalhoGeral = ws.addRow([`buser — Lista de Passageiros · ${dadosTabela.length} passageiros · ${ordemTrecho.length} trecho(s) · ${totalGrupos} grupo(s) · ${hoje}`]);
+    ws.mergeCells(`A1:${lastCol}1`);
+    cabecalhoGeral.height = 26;
+    cabecalhoGeral.getCell(1).font      = { bold:true, color:{argb:'FFFFFFFF'}, size:12 };
+    cabecalhoGeral.getCell(1).fill      = { type:'pattern', pattern:'solid', fgColor:{argb:'FFAD1457'} };
+    cabecalhoGeral.getCell(1).alignment = { horizontal:'center', vertical:'middle' };
+
+    ws.addRow([]); // linha em branco após cabeçalho geral
 
     const headers = temEmail
       ? ['Nome','Reserva','Trecho','E-mail','Documento']
       : ['Nome','Reserva','Trecho','Documento'];
 
-    // helper: converte hex #RRGGBB → FFRRGGBB para ExcelJS
-    const toArgb = hex => 'FF' + hex.replace('#','').toUpperCase();
-
-    ordemTrecho.forEach(trecho => {
+    ordemTrecho.forEach((trecho, tIdx) => {
       const linhas = porTrecho[trecho];
-      // Nome da aba limitado a 31 chars (limite do Excel)
-      const abaName = trecho.replace(/[:\\\/\?\*\[\]]/g,'').substring(0,31);
-      const ws = wb.addWorksheet(abaName);
+      const gruposNaTela = new Set(linhas.map(l => reservaParaGrupo[String(l[iReserva]||'').trim()]));
+      const qtdGrupos = [...gruposNaTela].filter(g => contagemGrupo[g] > 1).length;
 
-      // Larguras das colunas
-      ws.columns = temEmail
-        ? [{width:35},{width:12},{width:35},{width:30},{width:22}]
-        : [{width:35},{width:12},{width:35},{width:22}];
+      // ── Barra separadora do trecho ──────────────────────────────
+      const sepRow = ws.addRow([`${trecho}   ·   ${linhas.length} passageiro(s)   ·   ${qtdGrupos} grupo(s)`]);
+      const sepRowNum = sepRow.number;
+      ws.mergeCells(`A${sepRowNum}:${lastCol}${sepRowNum}`);
+      sepRow.height = 22;
+      sepRow.getCell(1).font      = { bold:true, color:{argb:'FFFFFFFF'}, size:10 };
+      sepRow.getCell(1).fill      = { type:'pattern', pattern:'solid', fgColor:{argb:'FFAD1457'} };
+      sepRow.getCell(1).alignment = { horizontal:'left', vertical:'middle', indent:1 };
 
-      // Linha de título (trecho)
-      const tituloRow = ws.addRow([trecho]);
-      ws.mergeCells(`A1:${temEmail?'E':'D'}1`);
-      tituloRow.height = 24;
-      tituloRow.getCell(1).font  = { bold:true, color:{argb:PINK_TEXT}, size:12 };
-      tituloRow.getCell(1).fill  = { type:'pattern', pattern:'solid', fgColor:{argb:PINK_BG} };
-      tituloRow.getCell(1).alignment = { horizontal:'center', vertical:'middle' };
-
-      // Linha de cabeçalho das colunas
-      const headerRow = ws.addRow(headers);
-      headerRow.height = 18;
-      headerRow.eachCell(cell => {
-        cell.font      = { bold:true, color:{argb:PINK_SUB_TEXT}, size:9 };
-        cell.fill      = { type:'pattern', pattern:'solid', fgColor:{argb:'FFF5F5F5'} };
+      // ── Cabeçalho das colunas ───────────────────────────────────
+      const hRow = ws.addRow(headers);
+      hRow.height = 16;
+      hRow.eachCell(cell => {
+        cell.font      = { bold:true, color:{argb:'FF880E4F'}, size:9 };
+        cell.fill      = { type:'pattern', pattern:'solid', fgColor:{argb:'FFFFF0F6'} };
         cell.alignment = { horizontal:'left', vertical:'middle' };
-        cell.border    = { bottom:{ style:'thin', color:{argb:'FFDDDDDD'} } };
+        cell.border    = { bottom:{ style:'thin', color:{argb:'FFFFCCDD'} } };
       });
 
-      // Linhas de dados
+      // ── Linhas de dados ─────────────────────────────────────────
       linhas.forEach((row, idx) => {
         const res     = String(row[iReserva]||'').trim();
         const tipoDoc = String(row[iDoc]||'').trim();
@@ -1019,7 +1028,7 @@ async function exportarXLSX() {
           : [row[iNome]||'', res, row[iTrecho]||'', docComb];
 
         const dataRow = ws.addRow(valores);
-        dataRow.height = 16;
+        dataRow.height = 15;
 
         const grupoId = reservaParaGrupo[res];
         const ci      = corDoGrupo[grupoId];
@@ -1037,9 +1046,12 @@ async function exportarXLSX() {
         });
       });
 
-      // Congela linha de cabeçalho
-      ws.views = [{ state:'frozen', ySplit:2 }];
+      // Linha em branco entre trechos (exceto no último)
+      if(tIdx < ordemTrecho.length - 1) ws.addRow([]);
     });
+
+    // Congela linha 1 (cabeçalho geral)
+    ws.views = [{ state:'frozen', ySplit:1 }];
 
     // Gera e baixa
     const buffer = await wb.xlsx.writeBuffer();
