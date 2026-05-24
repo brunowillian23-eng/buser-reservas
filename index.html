@@ -313,7 +313,6 @@
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <div class="nav-logo">
     <div class="nav-logo-mark">
@@ -331,7 +330,6 @@
   <span class="nav-badge">USO INTERNO</span>
 </nav>
 
-<!-- HERO -->
 <div class="hero">
   <div class="hero-inner">
     <h1>Central de Operações</h1>
@@ -349,7 +347,6 @@
 
 <div class="container">
 
-  <!-- ===== SEÇÃO 1: RESERVAS ===== -->
   <div id="tab-reservas" class="section active">
 
     <div class="card">
@@ -409,9 +406,9 @@
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/></svg>
         Exportar PDF
       </button>
-      <button class="btn btn-outline" onclick="exportarCSV()">
+      <button class="btn btn-outline" id="btn-excel-lista" onclick="exportarExcelColorido()">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Exportar CSV
+        Exportar Excel Colorido (.xlsx)
       </button>
       <input type="text" placeholder="Filtrar por nome, trecho..." oninput="filtrarTabela(this.value)">
     </div>
@@ -439,10 +436,7 @@
       <div class="legend-items" id="legend-items"></div>
     </div>
 
-  </div><!-- /tab-reservas -->
-
-  <!-- ===== SEÇÃO 2: JUNTAR PASSAGENS ===== -->
-  <div id="tab-passagens" class="section">
+  </div><div id="tab-passagens" class="section">
 
     <div class="card">
       <div class="card-title">
@@ -450,7 +444,7 @@
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
         </div>
         <div>
-          <h2>Juntar passagens em um único PDF</h2>
+          <h2>Juntar passagens in um único PDF</h2>
           <p>Suba PDFs e imagens, ordene arrastando e baixe tudo em um arquivo só</p>
         </div>
       </div>
@@ -485,11 +479,7 @@
       </div>
     </div>
 
-  </div><!-- /tab-passagens -->
-
-</div><!-- /container -->
-
-<div class="toast" id="toast">
+  </div></div><div class="toast" id="toast">
   ✓ <span id="toast-text">Salvo!</span>
 </div>
 
@@ -574,7 +564,6 @@ function preencherSelects() {
 }
 
 function resolverGruposCor(dadosOrdenados, iReserva, iEmail) {
-  // 1) agrupa por reserva
   const reservaParaGrupo = {};
   const emailParaGrupo   = {};
   let grupoCounter = 0;
@@ -585,404 +574,5 @@ function resolverGruposCor(dadosOrdenados, iReserva, iEmail) {
 
     let grupoId = reservaParaGrupo[res];
 
-    // se ainda não tem grupo, verifica se o email já está em algum grupo
     if(grupoId === undefined && email) {
-      grupoId = emailParaGrupo[email];
-    }
-
-    // cria grupo novo se necessário
-    if(grupoId === undefined) {
-      grupoId = ++grupoCounter;
-    }
-
-    reservaParaGrupo[res] = grupoId;
-    if(email) emailParaGrupo[email] = grupoId;
-  });
-
-  // conta quantas pessoas por grupo
-  const contagemGrupo = {};
-  dadosOrdenados.forEach(row => {
-    const res = String(row[iReserva]||'').trim();
-    const g   = reservaParaGrupo[res];
-    contagemGrupo[g] = (contagemGrupo[g]||0) + 1;
-  });
-
-  // só colorir grupos com 2+ pessoas
-  const gruposValidos = Object.keys(contagemGrupo).filter(g => contagemGrupo[g] > 1);
-  const corDoGrupo = {};
-  gruposValidos.sort().forEach((g, i) => corDoGrupo[g] = i % PALETTE.length);
-
-  return { reservaParaGrupo, corDoGrupo, contagemGrupo };
-}
-
-function gerarTabela() {
-  const iNome    = +document.getElementById('col-nome').value;
-  const iReserva = +document.getElementById('col-reserva').value;
-  const iTrecho  = +document.getElementById('col-trecho').value;
-  const iDoc     = +document.getElementById('col-documento').value;
-  const iNumDoc  = +document.getElementById('col-numdoc').value;
-  const iEmail   = +document.getElementById('col-email').value; // -1 se não usar
-
-  const ordenado = [...dadosTabela].sort((a,b) => String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
-  const { reservaParaGrupo, corDoGrupo, contagemGrupo } = resolverGruposCor(ordenado, iReserva, iEmail);
-
-  // para estatísticas
-  const reservasUnicas = new Set(dadosTabela.map(r => String(r[iReserva]||'').trim())).size;
-  const gruposComMais  = Object.values(contagemGrupo).filter(v => v > 1).length;
-  const gruposSozinhos = Object.values(contagemGrupo).filter(v => v === 1).length;
-
-  // salva mapa global para o PDF usar
-  window._grupoInfo = { reservaParaGrupo, corDoGrupo, contagemGrupo, iEmail };
-
-  const colHeaders = iEmail >= 0
-    ? ['Nome','Reserva','Trecho','E-mail','Documento']
-    : ['Nome','Reserva','Trecho','Documento'];
-
-  document.getElementById('table-head').innerHTML =
-    `<tr>${colHeaders.map(n=>`<th>${n}</th>`).join('')}</tr>`;
-
-  document.getElementById('table-body').innerHTML = ordenado.map((row, idx) => {
-    const res     = String(row[iReserva]||'').trim();
-    const grupoId = reservaParaGrupo[res];
-    const ci      = corDoGrupo[grupoId];
-    const bg      = ci !== undefined ? PALETTE[ci] : (idx%2===0?'#fff':'#FAFAFA');
-    const color   = ci !== undefined ? PALETTE_TEXT[ci] : '#333';
-    const tipoDoc = String(row[iDoc]||'').trim();
-    const numDoc  = String(row[iNumDoc]||'').trim();
-    const docComb = tipoDoc && numDoc && tipoDoc !== numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
-    const emailVal = iEmail >= 0 ? (row[iEmail]||'') : null;
-    const cells   = iEmail >= 0
-      ? [row[iNome], res, row[iTrecho], emailVal, docComb]
-      : [row[iNome], res, row[iTrecho], docComb];
-    return `<tr style="background:${bg}; border-bottom:1px solid #F0F0F0;">
-      ${cells.map(v=>`<td style="padding:9px 16px;color:${color};font-size:13px;">${v||''}</td>`).join('')}
-    </tr>`;
-  }).join('');
-
-  const hoje = new Date().toLocaleDateString('pt-BR');
-  document.getElementById('export-title').textContent = nomeArquivo;
-  document.getElementById('export-subtitle').textContent = `${dadosTabela.length} passageiros · ${gruposComMais} grupos identificados · ${hoje}`;
-
-  // legenda por grupo
-  const gruposLegenda = Object.entries(corDoGrupo).sort((a,b)=>+a[0]-+b[0]);
-  const reservaPorGrupo = {};
-  Object.entries(reservaParaGrupo).forEach(([res, g]) => {
-    if(!reservaPorGrupo[g]) reservaPorGrupo[g] = [];
-    reservaPorGrupo[g].push(res);
-  });
-  document.getElementById('legend-items').innerHTML = gruposLegenda.map(([g, ci]) => {
-    const reservas = [...new Set(reservaPorGrupo[g]||[])].join(', ');
-    return `<span class="legend-badge" style="background:${PALETTE[ci]};color:${PALETTE_TEXT[ci]};border-color:${PALETTE_TEXT[ci]}33;">${reservas} (${contagemGrupo[g]})</span>`;
-  }).join('');
-
-  document.getElementById('stat-passageiros').textContent = dadosTabela.length;
-  document.getElementById('stat-reservas').textContent    = reservasUnicas;
-  document.getElementById('stat-grupos').textContent      = gruposComMais;
-  document.getElementById('stat-solo').textContent        = gruposSozinhos;
-
-  ['stats-section','actions-section','export-area'].forEach(id => document.getElementById(id).classList.remove('hidden'));
-  document.getElementById('legend').classList[gruposComMais > 0 ? 'remove' : 'add']('hidden');
-}
-
-function filtrarTabela(txt) {
-  document.querySelectorAll('#table-body tr').forEach(r => {
-    r.style.display = r.textContent.toLowerCase().includes(txt.toLowerCase()) ? '' : 'none';
-  });
-}
-
-function exportarPNG() {
-  const btn = document.getElementById('btn-png');
-  btn.disabled = true; btn.textContent = 'Gerando...';
-  html2canvas(document.getElementById('export-area'), {scale:2, useCORS:true, backgroundColor:'#fff', logging:false}).then(canvas => {
-    const a = document.createElement('a');
-    const d = new Date().toISOString().slice(0,10);
-    a.download = `reservas_${d}.png`; a.href = canvas.toDataURL('image/png'); a.click();
-    btn.disabled = false; btn.textContent = 'Exportar PNG';
-    mostrarToast(`reservas_${d}.png salvo!`, false);
-  }).catch(() => { btn.disabled = false; btn.textContent = 'Exportar PNG'; mostrarToast('Erro ao gerar PNG.', true); });
-}
-
-function hexToRgb(hex) {
-  const r = parseInt(hex.slice(1,3),16);
-  const g = parseInt(hex.slice(3,5),16);
-  const b = parseInt(hex.slice(5,7),16);
-  return [r,g,b];
-}
-
-function exportarPDFLista() {
-  const btn = document.getElementById('btn-pdf-lista');
-  btn.disabled = true; btn.textContent = 'Gerando...';
-  try {
-    const iNome    = +document.getElementById('col-nome').value;
-    const iReserva = +document.getElementById('col-reserva').value;
-    const iTrecho  = +document.getElementById('col-trecho').value;
-    const iDoc     = +document.getElementById('col-documento').value;
-    const iNumDoc  = +document.getElementById('col-numdoc').value;
-    const iEmail   = +document.getElementById('col-email').value;
-
-    const ordenado = [...dadosTabela].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
-    const { reservaParaGrupo, corDoGrupo, contagemGrupo } = resolverGruposCor(ordenado, iReserva, iEmail);
-
-    // Agrupa por trecho mantendo ordem de aparição
-    const porTrecho = {};
-    const ordemTrecho = [];
-    ordenado.forEach(row => {
-      const trecho = String(row[iTrecho]||'Sem trecho').trim();
-      if(!porTrecho[trecho]) { porTrecho[trecho] = []; ordemTrecho.push(trecho); }
-      porTrecho[trecho].push(row);
-    });
-
-    const { jsPDF } = window.jspdf;
-    const doc  = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a3' });
-    const hoje = new Date().toLocaleDateString('pt-BR');
-    const pageW = doc.internal.pageSize.getWidth();
-    const pageH = doc.internal.pageSize.getHeight();
-    const margem = 32;
-
-    const temEmail = iEmail >= 0;
-    const colHeaders = temEmail
-      ? ['Nome','Reserva','Trecho','E-mail','Documento']
-      : ['Nome','Reserva','Trecho','Documento'];
-    const colWidths = temEmail
-      ? { 0:220, 1:80, 2:240, 3:190, 4:'auto' }
-      : { 0:260, 1:90, 2:300, 3:'auto' };
-
-    // ── Cabeçalho global (só na primeira página) ──────────────────────
-    doc.setFillColor(173, 20, 87);
-    doc.rect(0, 0, pageW, 46, 'F');
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(20); doc.setFont('helvetica','bold');
-    doc.text('buser', margem, 31);
-    doc.setFontSize(13); doc.setFont('helvetica','normal');
-    doc.text('Lista de Passageiros', pageW/2, 31, {align:'center'});
-    doc.setFontSize(9);
-    doc.text(hoje, pageW - margem, 31, {align:'right'});
-
-    // Faixa rosa claro com total geral
-    doc.setFillColor(248, 187, 217);
-    doc.rect(0, 46, pageW, 20, 'F');
-    doc.setTextColor(136, 14, 79);
-    doc.setFontSize(9); doc.setFont('helvetica','bold');
-    const totalGrupos = Object.values(contagemGrupo).filter(v=>v>1).length;
-    doc.text(`${dadosTabela.length} passageiros  ·  ${ordemTrecho.length} trecho(s)  ·  ${totalGrupos} grupo(s) identificado(s)`, margem, 59);
-
-    let cursorY = 70; // posição Y atual no documento
-
-    // ── Itera por trecho, TUDO CONTÍNUO ───────────────────────────────
-    ordemTrecho.forEach((trecho, tIdx) => {
-      const linhas = porTrecho[trecho];
-      const gruposNaTela = new Set(linhas.map(l => reservaParaGrupo[String(l[iReserva]||'').trim()]));
-      const qtdGrupos = [...gruposNaTela].filter(g => contagemGrupo[g] > 1).length;
-
-      // Espaço mínimo para caber a barra + cabeçalho da tabela (≈50pt)
-      // Se não couber, adiciona página mas NÃO repete o cabeçalho global
-      if(tIdx > 0 && cursorY + 50 > pageH - 30) {
-        doc.addPage();
-        cursorY = 20;
-      }
-
-      // ── Barra separadora de trecho ─────────────────────────────────
-      const barH = 28;
-      if(tIdx > 0) cursorY += 10; // espaço extra entre trechos
-
-      doc.setFillColor(173, 20, 87);
-      doc.roundedRect(margem, cursorY, pageW - margem*2, barH, 4, 4, 'F');
-      doc.setTextColor(255,255,255);
-      doc.setFontSize(10); doc.setFont('helvetica','bold');
-      doc.text(trecho, margem + 12, cursorY + 18);
-      doc.setFontSize(8); doc.setFont('helvetica','normal');
-      doc.text(`${linhas.length} passageiro(s)  ·  ${qtdGrupos} grupo(s)`, pageW - margem - 12, cursorY + 18, {align:'right'});
-
-      cursorY += barH + 2;
-
-      // ── Tabela do trecho ───────────────────────────────────────────
-      const tableRows = linhas.map(row => {
-        const res     = String(row[iReserva]||'').trim();
-        const tipoDoc = String(row[iDoc]||'').trim();
-        const numDoc  = String(row[iNumDoc]||'').trim();
-        const docComb = tipoDoc && numDoc && tipoDoc !== numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
-        const emailV  = temEmail ? String(row[iEmail]||'').trim() : null;
-        const grupoId = reservaParaGrupo[res];
-        const data    = temEmail
-          ? [row[iNome]||'', res, row[iTrecho]||'', emailV||'', docComb]
-          : [row[iNome]||'', res, row[iTrecho]||'', docComb];
-        return { data, grupoId };
-      });
-
-      doc.autoTable({
-        startY: cursorY,
-        head: [colHeaders],
-        body: tableRows.map(r => r.data),
-        styles: {
-          fontSize: 9,
-          cellPadding: 6,
-          font: 'helvetica',
-          textColor: [40,40,40],
-          lineColor: [220,220,220],
-          lineWidth: 0.3,
-          overflow: 'linebreak',
-        },
-        headStyles: {
-          fillColor: [240,240,240],
-          textColor: [100,100,100],
-          fontStyle: 'bold',
-          fontSize: 8,
-          halign: 'left',
-        },
-        columnStyles: colWidths,
-        didParseCell: function(data) {
-          if(data.section === 'body') {
-            const { grupoId } = tableRows[data.row.index] || {};
-            const ci = corDoGrupo[grupoId];
-            if(ci !== undefined) {
-              data.cell.styles.fillColor = hexToRgb(PALETTE[ci]);
-              data.cell.styles.textColor = hexToRgb(PALETTE_TEXT[ci]);
-              data.cell.styles.fontStyle = 'bold';
-            } else {
-              data.cell.styles.fillColor = data.row.index%2===0 ? [255,255,255] : [250,250,250];
-            }
-          }
-        },
-        margin: { left: margem, right: margem },
-        // Cabeçalho da tabela só repete se passar de página dentro do mesmo trecho
-        showHead: 'everyPage',
-      });
-
-      // Atualiza cursor para depois da tabela
-      cursorY = doc.lastAutoTable.finalY + 6;
-    });
-
-    const d = new Date().toISOString().slice(0,10);
-    doc.save(`reservas_${d}.pdf`);
-    btn.disabled = false; btn.textContent = 'Exportar PDF';
-    mostrarToast(`reservas_${d}.pdf salvo!`, false);
-  } catch(err) {
-    btn.disabled = false; btn.textContent = 'Exportar PDF';
-    mostrarToast('Erro: ' + err.message, true);
-    console.error(err);
-  }
-}
-
-function exportarCSV() {
-  const iNome = +document.getElementById('col-nome').value;
-  const iReserva = +document.getElementById('col-reserva').value;
-  const iTrecho = +document.getElementById('col-trecho').value;
-  const iDoc = +document.getElementById('col-documento').value;
-  const iNumDoc = +document.getElementById('col-numdoc').value;
-  const linhas = [['Nome','Reserva','Trecho','Documento'].join(','),
-    ...[...dadosTabela].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')))
-      .map(r => {
-        const tipoDoc = String(r[iDoc]||'').trim();
-        const numDoc = String(r[iNumDoc]||'').trim();
-        const doc = tipoDoc && numDoc && tipoDoc !== numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
-        return [r[iNome], r[iReserva], r[iTrecho], doc].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(',');
-      })
-  ].join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([linhas], {type:'text/csv'}));
-  a.download = 'reservas_agrupadas.csv'; a.click();
-}
-
-// ===== JUNTAR PASSAGENS =====
-let mergeFiles = [], dragSrcIndex = null;
-
-const mergeInput = document.getElementById('merge-input');
-const mergeDropZone = document.getElementById('merge-drop');
-
-mergeDropZone.addEventListener('dragover', e => { e.preventDefault(); mergeDropZone.classList.add('drag'); });
-mergeDropZone.addEventListener('dragleave', () => mergeDropZone.classList.remove('drag'));
-mergeDropZone.addEventListener('drop', e => { e.preventDefault(); mergeDropZone.classList.remove('drag'); adicionarArquivos(Array.from(e.dataTransfer.files)); });
-mergeInput.addEventListener('change', e => { adicionarArquivos(Array.from(e.target.files)); e.target.value=''; });
-
-function adicionarArquivos(files) {
-  const validos = files.filter(f => /\.(pdf|jpe?g|png)$/i.test(f.name));
-  validos.forEach(f => { if(!mergeFiles.find(x => x.name===f.name && x.size===f.size)) mergeFiles.push(f); });
-  renderizarLista();
-}
-
-function renderizarLista() {
-  const card = document.getElementById('merge-card');
-  if(mergeFiles.length === 0) { card.classList.add('hidden'); return; }
-  card.classList.remove('hidden');
-  document.getElementById('merge-count-label').textContent = `${mergeFiles.length} arquivo(s) · arraste para reordenar`;
-  const list = document.getElementById('merge-file-list');
-  list.innerHTML = mergeFiles.map((f,i) => {
-    const isPDF = /\.pdf$/i.test(f.name);
-    const size = f.size > 1024*1024 ? (f.size/1024/1024).toFixed(1)+'MB' : Math.round(f.size/1024)+'KB';
-    return `<div class="file-item" draggable="true" data-index="${i}"
-      ondragstart="dragStart(event,${i})" ondragover="dragOver(event,${i})"
-      ondrop="dropItem(event,${i})" ondragend="dragEnd(event)">
-      <span class="drag-handle">⠿</span>
-      <div class="file-icon ${isPDF?'pdf':'img'}">${isPDF?'PDF':'IMG'}</div>
-      <span class="file-name">${f.name}</span>
-      <span class="file-size">${size}</span>
-      <button class="btn-remove" onclick="removerArquivo(${i})">×</button>
-    </div>`;
-  }).join('');
-}
-
-function removerArquivo(i) { mergeFiles.splice(i,1); renderizarLista(); }
-function limparMerge() { mergeFiles=[]; renderizarLista(); document.getElementById('progress-wrap').style.display='none'; }
-function dragStart(e,i) { dragSrcIndex=i; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
-function dragOver(e,i) { e.preventDefault(); document.querySelectorAll('.file-item').forEach(el=>el.classList.remove('drag-over')); if(i!==dragSrcIndex) e.currentTarget.classList.add('drag-over'); }
-function dropItem(e,i) { e.preventDefault(); if(dragSrcIndex===null||dragSrcIndex===i) return; const m=mergeFiles.splice(dragSrcIndex,1)[0]; mergeFiles.splice(i,0,m); dragSrcIndex=null; renderizarLista(); }
-function dragEnd(e) { e.target.classList.remove('dragging'); document.querySelectorAll('.file-item').forEach(el=>el.classList.remove('drag-over')); }
-
-async function juntarPDFs() {
-  if(!mergeFiles.length) return;
-  const btn = document.getElementById('btn-merge');
-  const pw = document.getElementById('progress-wrap');
-  const pb = document.getElementById('progress-bar');
-  const st = document.getElementById('merge-status');
-  btn.disabled=true; btn.textContent='Processando...';
-  pw.style.display='block'; pb.style.width='0%';
-  try {
-    const { PDFDocument } = PDFLib;
-    const finalPdf = await PDFDocument.create();
-    for(let i=0; i<mergeFiles.length; i++) {
-      const file = mergeFiles[i];
-      const buf = await file.arrayBuffer();
-      pb.style.width = Math.round((i/mergeFiles.length)*85)+'%';
-      st.textContent = `Processando ${i+1}/${mergeFiles.length}...`;
-      if(/\.pdf$/i.test(file.name)) {
-        const src = await PDFDocument.load(buf, {ignoreEncryption:true});
-        const pages = await finalPdf.copyPages(src, src.getPageIndices());
-        pages.forEach(p => finalPdf.addPage(p));
-      } else {
-        const isJpeg = /\.jpe?g$/i.test(file.name);
-        const img = isJpeg ? await finalPdf.embedJpg(buf) : await finalPdf.embedPng(buf);
-        const page = finalPdf.addPage([img.width, img.height]);
-        page.drawImage(img, {x:0, y:0, width:img.width, height:img.height});
-      }
-    }
-    pb.style.width='95%'; st.textContent='Finalizando...';
-    const pdfBytes = await finalPdf.save();
-    const d = new Date().toISOString().slice(0,10);
-    const a = document.createElement('a');
-    a.download = `passagens_${d}.pdf`;
-    a.href = URL.createObjectURL(new Blob([pdfBytes], {type:'application/pdf'}));
-    a.click();
-    pb.style.width='100%';
-    btn.disabled=false; btn.textContent='Gerar PDF unificado';
-    st.textContent=`✓ PDF gerado com ${mergeFiles.length} arquivo(s)!`;
-    mostrarToast(`passagens_${d}.pdf salvo!`, false);
-    setTimeout(()=>{ pw.style.display='none'; pb.style.width='0%'; },3000);
-  } catch(err) {
-    btn.disabled=false; btn.textContent='Gerar PDF unificado';
-    st.textContent='Erro: '+err.message;
-    mostrarToast('Erro ao juntar arquivos.', true);
-    pw.style.display='none';
-  }
-}
-
-// ===== TOAST =====
-function mostrarToast(msg, erro) {
-  const t = document.getElementById('toast');
-  document.getElementById('toast-text').textContent = msg;
-  t.className = 'toast' + (erro?' error':'');
-  t.style.display='flex';
-  setTimeout(()=>t.style.display='none', 4000);
-}
-</script>
-</body>
-</html>
+      grupoId
