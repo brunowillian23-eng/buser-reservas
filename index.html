@@ -7,6 +7,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
   :root {
     --pink: #AD1457;
@@ -637,31 +639,141 @@ function exportarPNG() {
   }).catch(() => { btn.disabled = false; btn.textContent = 'Exportar PNG'; mostrarToast('Erro ao gerar PNG.', true); });
 }
 
-async function exportarPDFLista() {
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return [r,g,b];
+}
+
+function exportarPDFLista() {
   const btn = document.getElementById('btn-pdf-lista');
   btn.disabled = true; btn.textContent = 'Gerando...';
   try {
-    const canvas = await html2canvas(document.getElementById('export-area'), {scale:2, useCORS:true, backgroundColor:'#fff', logging:false});
-    const imgData = canvas.toDataURL('image/png');
-    const { PDFDocument } = PDFLib;
-    const pdfDoc = await PDFDocument.create();
-    const imgBytes = await fetch(imgData).then(r => r.arrayBuffer());
-    const pngImg = await pdfDoc.embedPng(imgBytes);
-    const { width: iw, height: ih } = pngImg;
-    const pageW = 595, pageH = Math.round((ih/iw)*pageW);
-    const page = pdfDoc.addPage([pageW, pageH]);
-    page.drawImage(pngImg, {x:0, y:0, width:pageW, height:pageH});
-    const pdfBytes = await pdfDoc.save();
-    const a = document.createElement('a');
+    const iNome    = +document.getElementById('col-nome').value;
+    const iReserva = +document.getElementById('col-reserva').value;
+    const iTrecho  = +document.getElementById('col-trecho').value;
+    const iDoc     = +document.getElementById('col-documento').value;
+    const iNumDoc  = +document.getElementById('col-numdoc').value;
+
+    // Monta contagem de reservas para saber quais colorir
+    const contagem = {};
+    dadosTabela.forEach(r => { const res = String(r[iReserva]||'').trim(); if(res) contagem[res]=(contagem[res]||0)+1; });
+    const grupos = Object.keys(contagem).filter(k=>contagem[k]>1).sort();
+    const coresIdx = {};
+    grupos.forEach((res,i) => coresIdx[res] = i % PALETTE.length);
+
+    const ordenado = [...dadosTabela].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
+
+    // Agrupa por trecho para páginas separadas
+    const porTrecho = {};
+    ordenado.forEach(row => {
+      const trecho = String(row[iTrecho]||'Sem trecho').trim();
+      if(!porTrecho[trecho]) porTrecho[trecho] = [];
+      porTrecho[trecho].push(row);
+    });
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    const pageW = doc.internal.pageSize.getWidth();
+    let primeiraPage = true;
+
+    Object.entries(porTrecho).forEach(([trecho, linhas]) => {
+      if(!primeiraPage) doc.addPage();
+      primeiraPage = false;
+
+      // Cabeçalho rosa
+      doc.setFillColor(173, 20, 87);
+      doc.rect(0, 0, pageW, 42, 'F');
+
+      // Logo "buser" no header
+      doc.setTextColor(255,255,255);
+      doc.setFontSize(16);
+      doc.setFont('helvetica','bold');
+      doc.text('buser', 30, 27);
+
+      // Título da viagem centralizado
+      doc.setFontSize(12);
+      doc.setFont('helvetica','normal');
+      doc.text(trecho, pageW/2, 27, {align:'center'});
+
+      // Data no canto direito
+      doc.setFontSize(9);
+      doc.text(hoje, pageW - 30, 27, {align:'right'});
+
+      // Subtítulo
+      doc.setFillColor(248, 187, 217);
+      doc.rect(0, 42, pageW, 20, 'F');
+      doc.setTextColor(136, 14, 79);
+      doc.setFontSize(9);
+      doc.setFont('helvetica','bold');
+      doc.text(`${linhas.length} passageiro(s)  ·  ${grupos.filter(g => linhas.some(l => String(l[iReserva]||'').trim()===g)).length} grupo(s) identificado(s)`, 30, 55);
+
+      // Monta rows com cores
+      const tableRows = linhas.map(row => {
+        const res = String(row[iReserva]||'').trim();
+        const tipoDoc = String(row[iDoc]||'').trim();
+        const numDoc  = String(row[iNumDoc]||'').trim();
+        const doc2 = tipoDoc && numDoc && tipoDoc!==numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
+        return {
+          data: [row[iNome]||'', res, row[iTrecho]||'', doc2],
+          reserva: res
+        };
+      });
+
+      doc.autoTable({
+        startY: 65,
+        head: [['Nome','Reserva','Trecho','Documento']],
+        body: tableRows.map(r => r.data),
+        styles: {
+          fontSize: 9,
+          cellPadding: 6,
+          font: 'helvetica',
+          textColor: [40,40,40],
+          lineColor: [220,220,220],
+          lineWidth: 0.3,
+        },
+        headStyles: {
+          fillColor: [245,245,245],
+          textColor: [100,100,100],
+          fontStyle: 'bold',
+          fontSize: 8,
+          halign: 'left',
+        },
+        columnStyles: {
+          0: { cellWidth: 180 },
+          1: { cellWidth: 70,  halign: 'center' },
+          2: { cellWidth: 220 },
+          3: { cellWidth: 'auto' },
+        },
+        didParseCell: function(data) {
+          if(data.section === 'body') {
+            const res = tableRows[data.row.index]?.reserva || '';
+            const ci  = coresIdx[res];
+            if(ci !== undefined) {
+              const bg  = hexToRgb(PALETTE[ci]);
+              const txt = hexToRgb(PALETTE_TEXT[ci]);
+              data.cell.styles.fillColor  = bg;
+              data.cell.styles.textColor  = txt;
+              data.cell.styles.fontStyle  = 'bold';
+            } else {
+              data.cell.styles.fillColor = data.row.index%2===0 ? [255,255,255] : [250,250,250];
+            }
+          }
+        },
+        margin: { left: 30, right: 30 },
+      });
+    });
+
     const d = new Date().toISOString().slice(0,10);
-    a.download = `reservas_${d}.pdf`;
-    a.href = URL.createObjectURL(new Blob([pdfBytes], {type:'application/pdf'}));
-    a.click();
+    doc.save(`reservas_${d}.pdf`);
     btn.disabled = false; btn.textContent = 'Exportar PDF';
     mostrarToast(`reservas_${d}.pdf salvo!`, false);
   } catch(err) {
     btn.disabled = false; btn.textContent = 'Exportar PDF';
     mostrarToast('Erro: ' + err.message, true);
+    console.error(err);
   }
 }
 
