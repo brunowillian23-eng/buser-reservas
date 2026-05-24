@@ -413,6 +413,10 @@
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         Exportar CSV
       </button>
+      <button class="btn btn-outline" id="btn-restaurar" onclick="restaurarTodos()" style="display:none; border-color:#AD1457; color:#AD1457;">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+        Restaurar lista completa <span id="btn-restaurar-count" style="background:#AD1457;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px;"></span>
+      </button>
       <input type="text" placeholder="Filtrar por nome, trecho..." oninput="filtrarTabela(this.value)">
     </div>
 
@@ -437,22 +441,6 @@
     <div class="legend-box hidden" id="legend">
       <div class="legend-lbl">Legenda — grupos com 2 ou mais pessoas na mesma reserva</div>
       <div class="legend-items" id="legend-items"></div>
-    </div>
-
-    <!-- PAINEL DE REMOVIDOS -->
-    <div id="removidos-panel" style="display:none; margin-top:16px;">
-      <div class="card" style="border-color:#ffcccc;">
-        <div class="card-title">
-          <div class="icon" style="background:#fff0f0;">
-            <svg width="18" height="18" fill="none" stroke="#c0392b" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-          </div>
-          <div>
-            <h2 style="color:#c0392b;">Passageiros removidos da lista</h2>
-            <p>Estes passageiros não serão incluídos nas exportações. Clique em "Restaurar" para devolver.</p>
-          </div>
-        </div>
-        <div id="removidos-lista" style="display:flex; flex-direction:column; gap:6px;"></div>
-      </div>
     </div>
 
   </div><!-- /tab-reservas -->
@@ -552,7 +540,9 @@ function processarArquivo(file) {
     colunas = json[0].map((c,i) => ({label: String(c||`coluna ${i+1}`), idx: i}));
     dadosTabela = json.slice(1).filter(r => r.some(c => c !== undefined && c !== ''));
     removidos = []; // limpa removidos ao carregar nova planilha
-    document.getElementById('removidos-panel').style.display = 'none';
+    document.getElementById('removidos-panel') && (document.getElementById('removidos-panel').style.display = 'none');
+    const btnR = document.getElementById('btn-restaurar');
+    if(btnR) btnR.style.display = 'none';
     preencherSelects();
     document.getElementById('config-section').classList.remove('hidden');
     document.getElementById('drop-zone').classList.add('hidden');
@@ -710,7 +700,7 @@ function gerarTabela() {
   document.getElementById('legend').classList[gruposComMais > 0 ? 'remove' : 'add']('hidden');
 }
 
-let removidos = []; // { row, idx }
+let removidos = []; // { row, idx, nome }
 
 function removerPassageiro(idxOriginal) {
   const iNome = +document.getElementById('col-nome').value;
@@ -719,47 +709,46 @@ function removerPassageiro(idxOriginal) {
   const nome = String(row[iNome]||'Passageiro').trim();
   if(!confirm(`Remover "${nome}" da lista?\n\nEle não será incluído nas exportações.`)) return;
 
+  // Some a linha da tabela com animação
+  const trEl = document.querySelector(`#table-body tr[data-idx="${idxOriginal}"]`);
+  if(trEl) {
+    trEl.style.transition = 'opacity 0.25s, transform 0.25s';
+    trEl.style.opacity = '0';
+    trEl.style.transform = 'translateX(20px)';
+    setTimeout(() => trEl.remove(), 260);
+  }
+
   // Guarda e remove de dadosTabela
   removidos.push({ row, idx: idxOriginal, nome });
   dadosTabela.splice(idxOriginal, 1);
 
-  // Re-renderiza tabela
-  gerarTabela();
-
-  // Mostra painel e adiciona item
-  renderizarRemovidos();
-  mostrarToast(`"${nome}" removido da lista.`, false);
+  // Recalcula índices nos botões restantes (re-renderiza silenciosamente)
+  setTimeout(() => { gerarTabela(); atualizarBtnRestaurar(); }, 300);
+  mostrarToast(`"${nome}" removido. Use "Restaurar lista" para desfazer.`, false);
 }
 
-function restaurarPassageiro(idxRemovidos) {
-  const item = removidos[idxRemovidos];
-  if(!item) return;
-  removidos.splice(idxRemovidos, 1);
-  dadosTabela.push(item.row);
+function restaurarTodos() {
+  if(removidos.length === 0) return;
+  removidos.forEach(item => dadosTabela.push(item.row));
+  removidos = [];
   gerarTabela();
-  renderizarRemovidos();
-  mostrarToast(`"${item.nome}" restaurado.`, false);
+  atualizarBtnRestaurar();
+  mostrarToast('Lista restaurada com todos os passageiros.', false);
+}
+
+function atualizarBtnRestaurar() {
+  const btn   = document.getElementById('btn-restaurar');
+  const count = document.getElementById('btn-restaurar-count');
+  if(removidos.length > 0) {
+    btn.style.display = 'inline-flex';
+    count.textContent = removidos.length;
+  } else {
+    btn.style.display = 'none';
+  }
 }
 
 function renderizarRemovidos() {
-  const panel = document.getElementById('removidos-panel');
-  const lista = document.getElementById('removidos-lista');
-  if(removidos.length === 0) { panel.style.display='none'; return; }
-  panel.style.display='block';
-  const iReserva = +document.getElementById('col-reserva').value;
-  const iTrecho  = +document.getElementById('col-trecho').value;
-  lista.innerHTML = removidos.map((item, i) => {
-    const res    = String(item.row[iReserva]||'').trim();
-    const trecho = String(item.row[iTrecho]||'').trim();
-    return `<div style="display:flex;align-items:center;gap:12px;padding:9px 14px;background:#fff8f8;border:1px solid #ffdddd;border-radius:8px;">
-      <svg width="14" height="14" fill="none" stroke="#c0392b" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-      <span style="flex:1;font-size:13px;color:#333;"><strong>${item.nome}</strong> <span style="color:#999;font-size:12px;">· ${res} · ${trecho}</span></span>
-      <button onclick="restaurarPassageiro(${i})"
-        style="background:#fff;border:1px solid #AD1457;color:#AD1457;border-radius:7px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;">
-        ↩ Restaurar
-      </button>
-    </div>`;
-  }).join('');
+  atualizarBtnRestaurar();
 }
 
 function filtrarTabela(txt) {
