@@ -384,7 +384,8 @@
         <div><label>Nome do passageiro</label><select id="col-nome"></select></div>
         <div><label>Código da reserva</label><select id="col-reserva"></select></div>
         <div><label>Trecho / Rota</label><select id="col-trecho"></select></div>
-        <div><label>Documento (RG/CPF)</label><select id="col-documento"></select></div>
+        <div><label>Tipo documento (RG/CPF)</label><select id="col-documento"></select></div>
+        <div><label>Número do documento</label><select id="col-numdoc"></select></div>
       </div>
       <button class="btn btn-pink" onclick="gerarTabela()">Gerar tabela agrupada</button>
     </div>
@@ -544,7 +545,8 @@ function preencherSelects() {
     'col-nome':['nome','name','passageiro'],
     'col-reserva':['reserva','reservation','booking','código','codigo'],
     'col-trecho':['trecho','rota','route','destino'],
-    'col-documento':['documento','document','rg','cpf','identidade','doc']
+    'col-documento':['tipo documento','tipo_documento','tipo doc','documento','rg','cpf','identidade','doc'],
+    'col-numdoc':['número','numero','num doc','numdoc','document','rg','cpf','identidade']
   };
   Object.entries(defaults).forEach(([id, kw]) => {
     const sel = document.getElementById(id);
@@ -552,6 +554,14 @@ function preencherSelects() {
     const match = colunas.find(c => kw.some(k => c.label.toLowerCase().includes(k)));
     if(match) sel.value = match.idx;
   });
+  // Se encontrou "tipo documento" e "documento" separados, ajusta automaticamente
+  const colTipo = colunas.find(c => c.label.toLowerCase().includes('tipo'));
+  const colNum = colunas.find(c => {
+    const l = c.label.toLowerCase();
+    return (l.includes('documento') || l === 'rg' || l === 'cpf') && !l.includes('tipo');
+  });
+  if(colTipo) document.getElementById('col-documento').value = colTipo.idx;
+  if(colNum) document.getElementById('col-numdoc').value = colNum.idx;
 }
 
 function gerarTabela() {
@@ -559,6 +569,7 @@ function gerarTabela() {
   const iReserva = +document.getElementById('col-reserva').value;
   const iTrecho = +document.getElementById('col-trecho').value;
   const iDoc = +document.getElementById('col-documento').value;
+  const iNumDoc = +document.getElementById('col-numdoc').value;
 
   const contagem = {};
   dadosTabela.forEach(r => { const res = String(r[iReserva]||'').trim(); if(res) contagem[res] = (contagem[res]||0)+1; });
@@ -568,7 +579,6 @@ function gerarTabela() {
   grupos.forEach((res,i) => coloresReserva[res] = i % PALETTE.length);
 
   const ordenado = [...dadosTabela].sort((a,b) => String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
-  const usedCols = [iNome, iReserva, iTrecho, iDoc];
   const colNames = ['Nome','Reserva','Trecho','Documento'];
 
   document.getElementById('table-head').innerHTML =
@@ -579,8 +589,15 @@ function gerarTabela() {
     const ci = coloresReserva[res];
     const bg = ci !== undefined ? PALETTE[ci] : (idx%2===0?'#fff':'#FAFAFA');
     const color = ci !== undefined ? PALETTE_TEXT[ci] : '#333';
+    // Combina tipo + número do documento
+    const tipoDoc = String(row[iDoc]||'').trim();
+    const numDoc = String(row[iNumDoc]||'').trim();
+    const docCombinado = tipoDoc && numDoc && tipoDoc !== numDoc
+      ? `${tipoDoc} · ${numDoc}`
+      : (numDoc || tipoDoc || '');
+    const cells = [row[iNome], row[iReserva], row[iTrecho], docCombinado];
     return `<tr style="background:${bg}; border-bottom:1px solid #F0F0F0;">
-      ${usedCols.map(i=>`<td style="padding:9px 16px;color:${color};font-size:13px;">${row[i]||''}</td>`).join('')}
+      ${cells.map(v=>`<td style="padding:9px 16px;color:${color};font-size:13px;">${v||''}</td>`).join('')}
     </tr>`;
   }).join('');
 
@@ -653,10 +670,15 @@ function exportarCSV() {
   const iReserva = +document.getElementById('col-reserva').value;
   const iTrecho = +document.getElementById('col-trecho').value;
   const iDoc = +document.getElementById('col-documento').value;
-  const cols = [iNome, iReserva, iTrecho, iDoc];
+  const iNumDoc = +document.getElementById('col-numdoc').value;
   const linhas = [['Nome','Reserva','Trecho','Documento'].join(','),
     ...[...dadosTabela].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')))
-      .map(r => cols.map(i=>`"${(r[i]||'').toString().replace(/"/g,'""')}"`).join(','))
+      .map(r => {
+        const tipoDoc = String(r[iDoc]||'').trim();
+        const numDoc = String(r[iNumDoc]||'').trim();
+        const doc = tipoDoc && numDoc && tipoDoc !== numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
+        return [r[iNome], r[iReserva], r[iTrecho], doc].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(',');
+      })
   ].join('\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([linhas], {type:'text/csv'}));
