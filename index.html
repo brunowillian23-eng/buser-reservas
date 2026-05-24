@@ -9,6 +9,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <style>
   :root {
     --pink: #AD1457;
@@ -409,9 +410,9 @@
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/></svg>
         Exportar PDF
       </button>
-      <button class="btn btn-outline" onclick="exportarCSV()">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Exportar CSV
+      <button class="btn btn-outline" onclick="exportarXLSX()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+        Exportar Excel
       </button>
       <button class="btn btn-outline" id="btn-restaurar" onclick="restaurarTodos()" style="display:none; border-color:#AD1457; color:#AD1457;">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
@@ -936,24 +937,126 @@ function exportarPDFLista() {
   }
 }
 
-function exportarCSV() {
-  const iNome = +document.getElementById('col-nome').value;
-  const iReserva = +document.getElementById('col-reserva').value;
-  const iTrecho = +document.getElementById('col-trecho').value;
-  const iDoc = +document.getElementById('col-documento').value;
-  const iNumDoc = +document.getElementById('col-numdoc').value;
-  const linhas = [['Nome','Reserva','Trecho','Documento'].join(','),
-    ...[...dadosTabela].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')))
-      .map(r => {
-        const tipoDoc = String(r[iDoc]||'').trim();
-        const numDoc = String(r[iNumDoc]||'').trim();
-        const doc = tipoDoc && numDoc && tipoDoc !== numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
-        return [r[iNome], r[iReserva], r[iTrecho], doc].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(',');
-      })
-  ].join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([linhas], {type:'text/csv'}));
-  a.download = 'reservas_agrupadas.csv'; a.click();
+async function exportarXLSX() {
+  const btn = document.querySelector('button[onclick="exportarXLSX()"]');
+  btn.disabled = true; btn.textContent = 'Gerando...';
+  try {
+    const iNome    = +document.getElementById('col-nome').value;
+    const iReserva = +document.getElementById('col-reserva').value;
+    const iTrecho  = +document.getElementById('col-trecho').value;
+    const iDoc     = +document.getElementById('col-documento').value;
+    const iNumDoc  = +document.getElementById('col-numdoc').value;
+    const iEmail   = +document.getElementById('col-email').value;
+    const temEmail = iEmail >= 0;
+
+    const ordenado = [...dadosTabela].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
+    const { reservaParaGrupo, corDoGrupo } = resolverGruposCor(ordenado, iReserva, iEmail);
+
+    // Agrupa por trecho
+    const porTrecho = {};
+    const ordemTrecho = [];
+    ordenado.forEach(row => {
+      const t = String(row[iTrecho]||'Sem trecho').trim();
+      if(!porTrecho[t]) { porTrecho[t] = []; ordemTrecho.push(t); }
+      porTrecho[t].push(row);
+    });
+
+    const wb = new ExcelJS.Workbook();
+    wb.creator = 'Buser';
+    wb.created = new Date();
+
+    // Cor rosa Buser para cabeçalhos
+    const PINK_BG   = 'FFAD1457';
+    const PINK_TEXT = 'FFFFFFFF';
+    const PINK_SUB  = 'FFF8BBD9';
+    const PINK_SUB_TEXT = 'FF880E4F';
+
+    const headers = temEmail
+      ? ['Nome','Reserva','Trecho','E-mail','Documento']
+      : ['Nome','Reserva','Trecho','Documento'];
+
+    // helper: converte hex #RRGGBB → FFRRGGBB para ExcelJS
+    const toArgb = hex => 'FF' + hex.replace('#','').toUpperCase();
+
+    ordemTrecho.forEach(trecho => {
+      const linhas = porTrecho[trecho];
+      // Nome da aba limitado a 31 chars (limite do Excel)
+      const abaName = trecho.replace(/[:\\\/\?\*\[\]]/g,'').substring(0,31);
+      const ws = wb.addWorksheet(abaName);
+
+      // Larguras das colunas
+      ws.columns = temEmail
+        ? [{width:35},{width:12},{width:35},{width:30},{width:22}]
+        : [{width:35},{width:12},{width:35},{width:22}];
+
+      // Linha de título (trecho)
+      const tituloRow = ws.addRow([trecho]);
+      ws.mergeCells(`A1:${temEmail?'E':'D'}1`);
+      tituloRow.height = 24;
+      tituloRow.getCell(1).font  = { bold:true, color:{argb:PINK_TEXT}, size:12 };
+      tituloRow.getCell(1).fill  = { type:'pattern', pattern:'solid', fgColor:{argb:PINK_BG} };
+      tituloRow.getCell(1).alignment = { horizontal:'center', vertical:'middle' };
+
+      // Linha de cabeçalho das colunas
+      const headerRow = ws.addRow(headers);
+      headerRow.height = 18;
+      headerRow.eachCell(cell => {
+        cell.font      = { bold:true, color:{argb:PINK_SUB_TEXT}, size:9 };
+        cell.fill      = { type:'pattern', pattern:'solid', fgColor:{argb:'FFF5F5F5'} };
+        cell.alignment = { horizontal:'left', vertical:'middle' };
+        cell.border    = { bottom:{ style:'thin', color:{argb:'FFDDDDDD'} } };
+      });
+
+      // Linhas de dados
+      linhas.forEach((row, idx) => {
+        const res     = String(row[iReserva]||'').trim();
+        const tipoDoc = String(row[iDoc]||'').trim();
+        const numDoc  = String(row[iNumDoc]||'').trim();
+        const docComb = tipoDoc && numDoc && tipoDoc!==numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
+        const emailV  = temEmail ? String(row[iEmail]||'').trim() : null;
+        const valores = temEmail
+          ? [row[iNome]||'', res, row[iTrecho]||'', emailV||'', docComb]
+          : [row[iNome]||'', res, row[iTrecho]||'', docComb];
+
+        const dataRow = ws.addRow(valores);
+        dataRow.height = 16;
+
+        const grupoId = reservaParaGrupo[res];
+        const ci      = corDoGrupo[grupoId];
+
+        dataRow.eachCell(cell => {
+          if(ci !== undefined) {
+            cell.fill = { type:'pattern', pattern:'solid', fgColor:{ argb: toArgb(PALETTE[ci]) } };
+            cell.font = { bold:true, color:{ argb: toArgb(PALETTE_TEXT[ci]) }, size:9 };
+          } else {
+            cell.fill = { type:'pattern', pattern:'solid', fgColor:{ argb: idx%2===0?'FFFFFFFF':'FFFAFAFA' } };
+            cell.font = { size:9, color:{ argb:'FF333333' } };
+          }
+          cell.alignment = { vertical:'middle' };
+          cell.border    = { bottom:{ style:'thin', color:{argb:'FFF0F0F0'} } };
+        });
+      });
+
+      // Congela linha de cabeçalho
+      ws.views = [{ state:'frozen', ySplit:2 }];
+    });
+
+    // Gera e baixa
+    const buffer = await wb.xlsx.writeBuffer();
+    const blob   = new Blob([buffer], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const a = document.createElement('a');
+    const d = new Date().toISOString().slice(0,10);
+    a.download = `reservas_${d}.xlsx`;
+    a.href = URL.createObjectURL(blob);
+    a.click();
+
+    btn.disabled = false; btn.textContent = 'Exportar Excel';
+    mostrarToast(`reservas_${d}.xlsx salvo!`, false);
+  } catch(err) {
+    btn.disabled = false; btn.textContent = 'Exportar Excel';
+    mostrarToast('Erro: ' + err.message, true);
+    console.error(err);
+  }
 }
 
 // ===== JUNTAR PASSAGENS =====
