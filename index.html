@@ -723,20 +723,21 @@ function exportarPDFLista() {
     const ordenado = [...dadosTabela].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
     const { reservaParaGrupo, corDoGrupo, contagemGrupo } = resolverGruposCor(ordenado, iReserva, iEmail);
 
-    // Agrupa por trecho → página separada
+    // Agrupa por trecho mantendo ordem de aparição
     const porTrecho = {};
+    const ordemTrecho = [];
     ordenado.forEach(row => {
       const trecho = String(row[iTrecho]||'Sem trecho').trim();
-      if(!porTrecho[trecho]) porTrecho[trecho] = [];
+      if(!porTrecho[trecho]) { porTrecho[trecho] = []; ordemTrecho.push(trecho); }
       porTrecho[trecho].push(row);
     });
 
     const { jsPDF } = window.jspdf;
-    // A3 landscape = 420 x 297mm → em pt: 1190.55 x 841.89
     const doc  = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a3' });
     const hoje = new Date().toLocaleDateString('pt-BR');
     const pageW = doc.internal.pageSize.getWidth();
-    let primeiraPage = true;
+    const pageH = doc.internal.pageSize.getHeight();
+    const margem = 32;
 
     const temEmail = iEmail >= 0;
     const colHeaders = temEmail
@@ -744,32 +745,57 @@ function exportarPDFLista() {
       : ['Nome','Reserva','Trecho','Documento'];
     const colWidths = temEmail
       ? { 0:220, 1:80, 2:240, 3:190, 4:'auto' }
-      : { 0:260, 1:90,  2:300, 3:'auto' };
+      : { 0:260, 1:90, 2:300, 3:'auto' };
 
-    Object.entries(porTrecho).forEach(([trecho, linhas]) => {
-      if(!primeiraPage) doc.addPage();
-      primeiraPage = false;
+    // ── Cabeçalho global (só na primeira página) ──────────────────────
+    doc.setFillColor(173, 20, 87);
+    doc.rect(0, 0, pageW, 46, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(20); doc.setFont('helvetica','bold');
+    doc.text('buser', margem, 31);
+    doc.setFontSize(13); doc.setFont('helvetica','normal');
+    doc.text('Lista de Passageiros', pageW/2, 31, {align:'center'});
+    doc.setFontSize(9);
+    doc.text(hoje, pageW - margem, 31, {align:'right'});
 
-      // Cabeçalho rosa
-      doc.setFillColor(173, 20, 87);
-      doc.rect(0, 0, pageW, 46, 'F');
-      doc.setTextColor(255,255,255);
-      doc.setFontSize(18); doc.setFont('helvetica','bold');
-      doc.text('buser', 32, 30);
-      doc.setFontSize(13); doc.setFont('helvetica','normal');
-      doc.text(trecho, pageW/2, 30, {align:'center'});
-      doc.setFontSize(9);
-      doc.text(hoje, pageW - 32, 30, {align:'right'});
+    // Faixa rosa claro com total geral
+    doc.setFillColor(248, 187, 217);
+    doc.rect(0, 46, pageW, 20, 'F');
+    doc.setTextColor(136, 14, 79);
+    doc.setFontSize(9); doc.setFont('helvetica','bold');
+    const totalGrupos = Object.values(contagemGrupo).filter(v=>v>1).length;
+    doc.text(`${dadosTabela.length} passageiros  ·  ${ordemTrecho.length} trecho(s)  ·  ${totalGrupos} grupo(s) identificado(s)`, margem, 59);
 
-      // Faixa rosa claro
+    let cursorY = 70; // posição Y atual no documento
+
+    // ── Itera por trecho, TUDO CONTÍNUO ───────────────────────────────
+    ordemTrecho.forEach((trecho, tIdx) => {
+      const linhas = porTrecho[trecho];
       const gruposNaTela = new Set(linhas.map(l => reservaParaGrupo[String(l[iReserva]||'').trim()]));
       const qtdGrupos = [...gruposNaTela].filter(g => contagemGrupo[g] > 1).length;
-      doc.setFillColor(248, 187, 217);
-      doc.rect(0, 46, pageW, 22, 'F');
-      doc.setTextColor(136, 14, 79);
-      doc.setFontSize(9); doc.setFont('helvetica','bold');
-      doc.text(`${linhas.length} passageiro(s)  ·  ${qtdGrupos} grupo(s) identificado(s)`, 32, 61);
 
+      // Espaço mínimo para caber a barra + cabeçalho da tabela (≈50pt)
+      // Se não couber, adiciona página mas NÃO repete o cabeçalho global
+      if(tIdx > 0 && cursorY + 50 > pageH - 30) {
+        doc.addPage();
+        cursorY = 20;
+      }
+
+      // ── Barra separadora de trecho ─────────────────────────────────
+      const barH = 28;
+      if(tIdx > 0) cursorY += 10; // espaço extra entre trechos
+
+      doc.setFillColor(173, 20, 87);
+      doc.roundedRect(margem, cursorY, pageW - margem*2, barH, 4, 4, 'F');
+      doc.setTextColor(255,255,255);
+      doc.setFontSize(10); doc.setFont('helvetica','bold');
+      doc.text(trecho, margem + 12, cursorY + 18);
+      doc.setFontSize(8); doc.setFont('helvetica','normal');
+      doc.text(`${linhas.length} passageiro(s)  ·  ${qtdGrupos} grupo(s)`, pageW - margem - 12, cursorY + 18, {align:'right'});
+
+      cursorY += barH + 2;
+
+      // ── Tabela do trecho ───────────────────────────────────────────
       const tableRows = linhas.map(row => {
         const res     = String(row[iReserva]||'').trim();
         const tipoDoc = String(row[iDoc]||'').trim();
@@ -784,12 +810,12 @@ function exportarPDFLista() {
       });
 
       doc.autoTable({
-        startY: 71,
+        startY: cursorY,
         head: [colHeaders],
         body: tableRows.map(r => r.data),
         styles: {
           fontSize: 9,
-          cellPadding: 7,
+          cellPadding: 6,
           font: 'helvetica',
           textColor: [40,40,40],
           lineColor: [220,220,220],
@@ -797,7 +823,7 @@ function exportarPDFLista() {
           overflow: 'linebreak',
         },
         headStyles: {
-          fillColor: [245,245,245],
+          fillColor: [240,240,240],
           textColor: [100,100,100],
           fontStyle: 'bold',
           fontSize: 8,
@@ -817,8 +843,13 @@ function exportarPDFLista() {
             }
           }
         },
-        margin: { left: 32, right: 32 },
+        margin: { left: margem, right: margem },
+        // Cabeçalho da tabela só repete se passar de página dentro do mesmo trecho
+        showHead: 'everyPage',
       });
+
+      // Atualiza cursor para depois da tabela
+      cursorY = doc.lastAutoTable.finalY + 6;
     });
 
     const d = new Date().toISOString().slice(0,10);
