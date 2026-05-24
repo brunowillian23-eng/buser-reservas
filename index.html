@@ -439,22 +439,6 @@
       <div class="legend-items" id="legend-items"></div>
     </div>
 
-    <!-- PAINEL DE REMOVIDOS -->
-    <div id="removidos-panel" style="display:none; margin-top:16px;">
-      <div class="card" style="border-color:#ffcccc;">
-        <div class="card-title">
-          <div class="icon" style="background:#fff0f0;">
-            <svg width="18" height="18" fill="none" stroke="#c0392b" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-          </div>
-          <div>
-            <h2 style="color:#c0392b;">Passageiros removidos da lista</h2>
-            <p>Estes passageiros não serão incluídos nas exportações. Clique em "Restaurar" para devolver.</p>
-          </div>
-        </div>
-        <div id="removidos-lista" style="display:flex; flex-direction:column; gap:6px;"></div>
-      </div>
-    </div>
-
   </div><!-- /tab-reservas -->
 
   <!-- ===== SEÇÃO 2: JUNTAR PASSAGENS ===== -->
@@ -551,8 +535,6 @@ function processarArquivo(file) {
     if(json.length < 2) return;
     colunas = json[0].map((c,i) => ({label: String(c||`coluna ${i+1}`), idx: i}));
     dadosTabela = json.slice(1).filter(r => r.some(c => c !== undefined && c !== ''));
-    removidos = []; // limpa removidos ao carregar nova planilha
-    document.getElementById('removidos-panel').style.display = 'none';
     preencherSelects();
     document.getElementById('config-section').classList.remove('hidden');
     document.getElementById('drop-zone').classList.add('hidden');
@@ -656,9 +638,8 @@ function gerarTabela() {
     ? ['Nome','Reserva','Trecho','E-mail','Documento']
     : ['Nome','Reserva','Trecho','Documento'];
 
-  // Adiciona coluna "Ação" no cabeçalho
   document.getElementById('table-head').innerHTML =
-    `<tr>${colHeaders.map(n=>`<th>${n}</th>`).join('')}<th style="width:50px;"></th></tr>`;
+    `<tr>${colHeaders.map(n=>`<th>${n}</th>`).join('')}</tr>`;
 
   document.getElementById('table-body').innerHTML = ordenado.map((row, idx) => {
     const res     = String(row[iReserva]||'').trim();
@@ -673,15 +654,8 @@ function gerarTabela() {
     const cells   = iEmail >= 0
       ? [row[iNome], res, row[iTrecho], emailVal, docComb]
       : [row[iNome], res, row[iTrecho], docComb];
-    // índice real na dadosTabela para poder remover
-    const idxOriginal = dadosTabela.indexOf(row);
-    return `<tr data-idx="${idxOriginal}" style="background:${bg}; border-bottom:1px solid #F0F0F0; transition:opacity 0.2s;">
+    return `<tr style="background:${bg}; border-bottom:1px solid #F0F0F0;">
       ${cells.map(v=>`<td style="padding:9px 16px;color:${color};font-size:13px;">${v||''}</td>`).join('')}
-      <td style="padding:6px 10px; text-align:center;">
-        <button onclick="removerPassageiro(${idxOriginal})" title="Remover passageiro da lista"
-          style="background:none;border:1px solid #ffcccc;border-radius:6px;padding:3px 8px;cursor:pointer;color:#c0392b;font-size:12px;font-weight:600;transition:all 0.15s;"
-          onmouseover="this.style.background='#fff0f0'" onmouseout="this.style.background='none'">✕</button>
-      </td>
     </tr>`;
   }).join('');
 
@@ -710,58 +684,6 @@ function gerarTabela() {
   document.getElementById('legend').classList[gruposComMais > 0 ? 'remove' : 'add']('hidden');
 }
 
-let removidos = []; // { row, idx }
-
-function removerPassageiro(idxOriginal) {
-  const iNome = +document.getElementById('col-nome').value;
-  const row = dadosTabela[idxOriginal];
-  if(!row) return;
-  const nome = String(row[iNome]||'Passageiro').trim();
-  if(!confirm(`Remover "${nome}" da lista?\n\nEle não será incluído nas exportações.`)) return;
-
-  // Guarda e remove de dadosTabela
-  removidos.push({ row, idx: idxOriginal, nome });
-  dadosTabela.splice(idxOriginal, 1);
-
-  // Re-renderiza tabela
-  gerarTabela();
-
-  // Mostra painel e adiciona item
-  renderizarRemovidos();
-  mostrarToast(`"${nome}" removido da lista.`, false);
-}
-
-function restaurarPassageiro(idxRemovidos) {
-  const item = removidos[idxRemovidos];
-  if(!item) return;
-  removidos.splice(idxRemovidos, 1);
-  dadosTabela.push(item.row);
-  gerarTabela();
-  renderizarRemovidos();
-  mostrarToast(`"${item.nome}" restaurado.`, false);
-}
-
-function renderizarRemovidos() {
-  const panel = document.getElementById('removidos-panel');
-  const lista = document.getElementById('removidos-lista');
-  if(removidos.length === 0) { panel.style.display='none'; return; }
-  panel.style.display='block';
-  const iReserva = +document.getElementById('col-reserva').value;
-  const iTrecho  = +document.getElementById('col-trecho').value;
-  lista.innerHTML = removidos.map((item, i) => {
-    const res    = String(item.row[iReserva]||'').trim();
-    const trecho = String(item.row[iTrecho]||'').trim();
-    return `<div style="display:flex;align-items:center;gap:12px;padding:9px 14px;background:#fff8f8;border:1px solid #ffdddd;border-radius:8px;">
-      <svg width="14" height="14" fill="none" stroke="#c0392b" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-      <span style="flex:1;font-size:13px;color:#333;"><strong>${item.nome}</strong> <span style="color:#999;font-size:12px;">· ${res} · ${trecho}</span></span>
-      <button onclick="restaurarPassageiro(${i})"
-        style="background:#fff;border:1px solid #AD1457;color:#AD1457;border-radius:7px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;">
-        ↩ Restaurar
-      </button>
-    </div>`;
-  }).join('');
-}
-
 function filtrarTabela(txt) {
   document.querySelectorAll('#table-body tr').forEach(r => {
     r.style.display = r.textContent.toLowerCase().includes(txt.toLowerCase()) ? '' : 'none';
@@ -771,19 +693,13 @@ function filtrarTabela(txt) {
 function exportarPNG() {
   const btn = document.getElementById('btn-png');
   btn.disabled = true; btn.textContent = 'Gerando...';
-  // Esconde botões de remover antes de capturar
-  document.querySelectorAll('#table-body td:last-child, #table-head th:last-child').forEach(el => el.style.display='none');
   html2canvas(document.getElementById('export-area'), {scale:2, useCORS:true, backgroundColor:'#fff', logging:false}).then(canvas => {
-    document.querySelectorAll('#table-body td:last-child, #table-head th:last-child').forEach(el => el.style.display='');
     const a = document.createElement('a');
     const d = new Date().toISOString().slice(0,10);
     a.download = `reservas_${d}.png`; a.href = canvas.toDataURL('image/png'); a.click();
     btn.disabled = false; btn.textContent = 'Exportar PNG';
     mostrarToast(`reservas_${d}.png salvo!`, false);
-  }).catch(() => {
-    document.querySelectorAll('#table-body td:last-child, #table-head th:last-child').forEach(el => el.style.display='');
-    btn.disabled = false; btn.textContent = 'Exportar PNG'; mostrarToast('Erro ao gerar PNG.', true);
-  });
+  }).catch(() => { btn.disabled = false; btn.textContent = 'Exportar PNG'; mostrarToast('Erro ao gerar PNG.', true); });
 }
 
 function hexToRgb(hex) {
