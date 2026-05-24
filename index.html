@@ -388,6 +388,7 @@
         <div><label>Trecho / Rota</label><select id="col-trecho"></select></div>
         <div><label>Tipo documento (RG/CPF)</label><select id="col-documento"></select></div>
         <div><label>Número do documento</label><select id="col-numdoc"></select></div>
+        <div><label>E-mail (opcional)</label><select id="col-email"><option value="-1">— não usar —</option></select></div>
       </div>
       <button class="btn btn-pink" onclick="gerarTabela()">Gerar tabela agrupada</button>
     </div>
@@ -556,48 +557,103 @@ function preencherSelects() {
     const match = colunas.find(c => kw.some(k => c.label.toLowerCase().includes(k)));
     if(match) sel.value = match.idx;
   });
-  // Se encontrou "tipo documento" e "documento" separados, ajusta automaticamente
   const colTipo = colunas.find(c => c.label.toLowerCase().includes('tipo'));
   const colNum = colunas.find(c => {
     const l = c.label.toLowerCase();
     return (l.includes('documento') || l === 'rg' || l === 'cpf') && !l.includes('tipo');
   });
   if(colTipo) document.getElementById('col-documento').value = colTipo.idx;
-  if(colNum) document.getElementById('col-numdoc').value = colNum.idx;
+  if(colNum)  document.getElementById('col-numdoc').value = colNum.idx;
+
+  // E-mail: adiciona opção "não usar" + todas as colunas
+  const selEmail = document.getElementById('col-email');
+  selEmail.innerHTML = '<option value="-1">— não usar —</option>' +
+    colunas.map(c => `<option value="${c.idx}">${c.label}</option>`).join('');
+  const colEmail = colunas.find(c => c.label.toLowerCase().includes('email') || c.label.toLowerCase().includes('e-mail') || c.label.toLowerCase().includes('mail'));
+  if(colEmail) selEmail.value = colEmail.idx;
+}
+
+function resolverGruposCor(dadosOrdenados, iReserva, iEmail) {
+  // 1) agrupa por reserva
+  const reservaParaGrupo = {};
+  const emailParaGrupo   = {};
+  let grupoCounter = 0;
+
+  dadosOrdenados.forEach(row => {
+    const res   = String(row[iReserva]||'').trim();
+    const email = iEmail >= 0 ? String(row[iEmail]||'').trim().toLowerCase() : '';
+
+    let grupoId = reservaParaGrupo[res];
+
+    // se ainda não tem grupo, verifica se o email já está em algum grupo
+    if(grupoId === undefined && email) {
+      grupoId = emailParaGrupo[email];
+    }
+
+    // cria grupo novo se necessário
+    if(grupoId === undefined) {
+      grupoId = ++grupoCounter;
+    }
+
+    reservaParaGrupo[res] = grupoId;
+    if(email) emailParaGrupo[email] = grupoId;
+  });
+
+  // conta quantas pessoas por grupo
+  const contagemGrupo = {};
+  dadosOrdenados.forEach(row => {
+    const res = String(row[iReserva]||'').trim();
+    const g   = reservaParaGrupo[res];
+    contagemGrupo[g] = (contagemGrupo[g]||0) + 1;
+  });
+
+  // só colorir grupos com 2+ pessoas
+  const gruposValidos = Object.keys(contagemGrupo).filter(g => contagemGrupo[g] > 1);
+  const corDoGrupo = {};
+  gruposValidos.sort().forEach((g, i) => corDoGrupo[g] = i % PALETTE.length);
+
+  return { reservaParaGrupo, corDoGrupo, contagemGrupo };
 }
 
 function gerarTabela() {
-  const iNome = +document.getElementById('col-nome').value;
+  const iNome    = +document.getElementById('col-nome').value;
   const iReserva = +document.getElementById('col-reserva').value;
-  const iTrecho = +document.getElementById('col-trecho').value;
-  const iDoc = +document.getElementById('col-documento').value;
-  const iNumDoc = +document.getElementById('col-numdoc').value;
-
-  const contagem = {};
-  dadosTabela.forEach(r => { const res = String(r[iReserva]||'').trim(); if(res) contagem[res] = (contagem[res]||0)+1; });
-
-  const grupos = Object.keys(contagem).filter(k => contagem[k] > 1).sort();
-  coloresReserva = {};
-  grupos.forEach((res,i) => coloresReserva[res] = i % PALETTE.length);
+  const iTrecho  = +document.getElementById('col-trecho').value;
+  const iDoc     = +document.getElementById('col-documento').value;
+  const iNumDoc  = +document.getElementById('col-numdoc').value;
+  const iEmail   = +document.getElementById('col-email').value; // -1 se não usar
 
   const ordenado = [...dadosTabela].sort((a,b) => String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
-  const colNames = ['Nome','Reserva','Trecho','Documento'];
+  const { reservaParaGrupo, corDoGrupo, contagemGrupo } = resolverGruposCor(ordenado, iReserva, iEmail);
+
+  // para estatísticas
+  const reservasUnicas = new Set(dadosTabela.map(r => String(r[iReserva]||'').trim())).size;
+  const gruposComMais  = Object.values(contagemGrupo).filter(v => v > 1).length;
+  const gruposSozinhos = Object.values(contagemGrupo).filter(v => v === 1).length;
+
+  // salva mapa global para o PDF usar
+  window._grupoInfo = { reservaParaGrupo, corDoGrupo, contagemGrupo, iEmail };
+
+  const colHeaders = iEmail >= 0
+    ? ['Nome','Reserva','Trecho','E-mail','Documento']
+    : ['Nome','Reserva','Trecho','Documento'];
 
   document.getElementById('table-head').innerHTML =
-    `<tr>${colNames.map(n=>`<th>${n}</th>`).join('')}</tr>`;
+    `<tr>${colHeaders.map(n=>`<th>${n}</th>`).join('')}</tr>`;
 
-  document.getElementById('table-body').innerHTML = ordenado.map((row,idx) => {
-    const res = String(row[iReserva]||'').trim();
-    const ci = coloresReserva[res];
-    const bg = ci !== undefined ? PALETTE[ci] : (idx%2===0?'#fff':'#FAFAFA');
-    const color = ci !== undefined ? PALETTE_TEXT[ci] : '#333';
-    // Combina tipo + número do documento
+  document.getElementById('table-body').innerHTML = ordenado.map((row, idx) => {
+    const res     = String(row[iReserva]||'').trim();
+    const grupoId = reservaParaGrupo[res];
+    const ci      = corDoGrupo[grupoId];
+    const bg      = ci !== undefined ? PALETTE[ci] : (idx%2===0?'#fff':'#FAFAFA');
+    const color   = ci !== undefined ? PALETTE_TEXT[ci] : '#333';
     const tipoDoc = String(row[iDoc]||'').trim();
-    const numDoc = String(row[iNumDoc]||'').trim();
-    const docCombinado = tipoDoc && numDoc && tipoDoc !== numDoc
-      ? `${tipoDoc} · ${numDoc}`
-      : (numDoc || tipoDoc || '');
-    const cells = [row[iNome], row[iReserva], row[iTrecho], docCombinado];
+    const numDoc  = String(row[iNumDoc]||'').trim();
+    const docComb = tipoDoc && numDoc && tipoDoc !== numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
+    const emailVal = iEmail >= 0 ? (row[iEmail]||'') : null;
+    const cells   = iEmail >= 0
+      ? [row[iNome], res, row[iTrecho], emailVal, docComb]
+      : [row[iNome], res, row[iTrecho], docComb];
     return `<tr style="background:${bg}; border-bottom:1px solid #F0F0F0;">
       ${cells.map(v=>`<td style="padding:9px 16px;color:${color};font-size:13px;">${v||''}</td>`).join('')}
     </tr>`;
@@ -605,20 +661,27 @@ function gerarTabela() {
 
   const hoje = new Date().toLocaleDateString('pt-BR');
   document.getElementById('export-title').textContent = nomeArquivo;
-  document.getElementById('export-subtitle').textContent = `${dadosTabela.length} passageiros · ${grupos.length} grupos identificados · ${hoje}`;
+  document.getElementById('export-subtitle').textContent = `${dadosTabela.length} passageiros · ${gruposComMais} grupos identificados · ${hoje}`;
 
-  document.getElementById('legend-items').innerHTML = grupos.map(res => {
-    const ci = coloresReserva[res];
-    return `<span class="legend-badge" style="background:${PALETTE[ci]};color:${PALETTE_TEXT[ci]};border-color:${PALETTE_TEXT[ci]}33;">${res} (${contagem[res]})</span>`;
+  // legenda por grupo
+  const gruposLegenda = Object.entries(corDoGrupo).sort((a,b)=>+a[0]-+b[0]);
+  const reservaPorGrupo = {};
+  Object.entries(reservaParaGrupo).forEach(([res, g]) => {
+    if(!reservaPorGrupo[g]) reservaPorGrupo[g] = [];
+    reservaPorGrupo[g].push(res);
+  });
+  document.getElementById('legend-items').innerHTML = gruposLegenda.map(([g, ci]) => {
+    const reservas = [...new Set(reservaPorGrupo[g]||[])].join(', ');
+    return `<span class="legend-badge" style="background:${PALETTE[ci]};color:${PALETTE_TEXT[ci]};border-color:${PALETTE_TEXT[ci]}33;">${reservas} (${contagemGrupo[g]})</span>`;
   }).join('');
 
   document.getElementById('stat-passageiros').textContent = dadosTabela.length;
-  document.getElementById('stat-reservas').textContent = Object.keys(contagem).length;
-  document.getElementById('stat-grupos').textContent = grupos.length;
-  document.getElementById('stat-solo').textContent = Object.values(contagem).filter(v=>v===1).length;
+  document.getElementById('stat-reservas').textContent    = reservasUnicas;
+  document.getElementById('stat-grupos').textContent      = gruposComMais;
+  document.getElementById('stat-solo').textContent        = gruposSozinhos;
 
   ['stats-section','actions-section','export-area'].forEach(id => document.getElementById(id).classList.remove('hidden'));
-  document.getElementById('legend').classList[grupos.length > 0 ? 'remove' : 'add']('hidden');
+  document.getElementById('legend').classList[gruposComMais > 0 ? 'remove' : 'add']('hidden');
 }
 
 function filtrarTabela(txt) {
@@ -655,17 +718,12 @@ function exportarPDFLista() {
     const iTrecho  = +document.getElementById('col-trecho').value;
     const iDoc     = +document.getElementById('col-documento').value;
     const iNumDoc  = +document.getElementById('col-numdoc').value;
-
-    // Monta contagem de reservas para saber quais colorir
-    const contagem = {};
-    dadosTabela.forEach(r => { const res = String(r[iReserva]||'').trim(); if(res) contagem[res]=(contagem[res]||0)+1; });
-    const grupos = Object.keys(contagem).filter(k=>contagem[k]>1).sort();
-    const coresIdx = {};
-    grupos.forEach((res,i) => coresIdx[res] = i % PALETTE.length);
+    const iEmail   = +document.getElementById('col-email').value;
 
     const ordenado = [...dadosTabela].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
+    const { reservaParaGrupo, corDoGrupo, contagemGrupo } = resolverGruposCor(ordenado, iReserva, iEmail);
 
-    // Agrupa por trecho para páginas separadas
+    // Agrupa por trecho → página separada
     const porTrecho = {};
     ordenado.forEach(row => {
       const trecho = String(row[iTrecho]||'Sem trecho').trim();
@@ -674,10 +732,19 @@ function exportarPDFLista() {
     });
 
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+    // A3 landscape = 420 x 297mm → em pt: 1190.55 x 841.89
+    const doc  = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a3' });
     const hoje = new Date().toLocaleDateString('pt-BR');
     const pageW = doc.internal.pageSize.getWidth();
     let primeiraPage = true;
+
+    const temEmail = iEmail >= 0;
+    const colHeaders = temEmail
+      ? ['Nome','Reserva','Trecho','E-mail','Documento']
+      : ['Nome','Reserva','Trecho','Documento'];
+    const colWidths = temEmail
+      ? { 0:220, 1:80, 2:240, 3:190, 4:'auto' }
+      : { 0:260, 1:90,  2:300, 3:'auto' };
 
     Object.entries(porTrecho).forEach(([trecho, linhas]) => {
       if(!primeiraPage) doc.addPage();
@@ -685,54 +752,49 @@ function exportarPDFLista() {
 
       // Cabeçalho rosa
       doc.setFillColor(173, 20, 87);
-      doc.rect(0, 0, pageW, 42, 'F');
-
-      // Logo "buser" no header
+      doc.rect(0, 0, pageW, 46, 'F');
       doc.setTextColor(255,255,255);
-      doc.setFontSize(16);
-      doc.setFont('helvetica','bold');
-      doc.text('buser', 30, 27);
-
-      // Título da viagem centralizado
-      doc.setFontSize(12);
-      doc.setFont('helvetica','normal');
-      doc.text(trecho, pageW/2, 27, {align:'center'});
-
-      // Data no canto direito
+      doc.setFontSize(18); doc.setFont('helvetica','bold');
+      doc.text('buser', 32, 30);
+      doc.setFontSize(13); doc.setFont('helvetica','normal');
+      doc.text(trecho, pageW/2, 30, {align:'center'});
       doc.setFontSize(9);
-      doc.text(hoje, pageW - 30, 27, {align:'right'});
+      doc.text(hoje, pageW - 32, 30, {align:'right'});
 
-      // Subtítulo
+      // Faixa rosa claro
+      const gruposNaTela = new Set(linhas.map(l => reservaParaGrupo[String(l[iReserva]||'').trim()]));
+      const qtdGrupos = [...gruposNaTela].filter(g => contagemGrupo[g] > 1).length;
       doc.setFillColor(248, 187, 217);
-      doc.rect(0, 42, pageW, 20, 'F');
+      doc.rect(0, 46, pageW, 22, 'F');
       doc.setTextColor(136, 14, 79);
-      doc.setFontSize(9);
-      doc.setFont('helvetica','bold');
-      doc.text(`${linhas.length} passageiro(s)  ·  ${grupos.filter(g => linhas.some(l => String(l[iReserva]||'').trim()===g)).length} grupo(s) identificado(s)`, 30, 55);
+      doc.setFontSize(9); doc.setFont('helvetica','bold');
+      doc.text(`${linhas.length} passageiro(s)  ·  ${qtdGrupos} grupo(s) identificado(s)`, 32, 61);
 
-      // Monta rows com cores
       const tableRows = linhas.map(row => {
-        const res = String(row[iReserva]||'').trim();
+        const res     = String(row[iReserva]||'').trim();
         const tipoDoc = String(row[iDoc]||'').trim();
         const numDoc  = String(row[iNumDoc]||'').trim();
-        const doc2 = tipoDoc && numDoc && tipoDoc!==numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
-        return {
-          data: [row[iNome]||'', res, row[iTrecho]||'', doc2],
-          reserva: res
-        };
+        const docComb = tipoDoc && numDoc && tipoDoc !== numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
+        const emailV  = temEmail ? String(row[iEmail]||'').trim() : null;
+        const grupoId = reservaParaGrupo[res];
+        const data    = temEmail
+          ? [row[iNome]||'', res, row[iTrecho]||'', emailV||'', docComb]
+          : [row[iNome]||'', res, row[iTrecho]||'', docComb];
+        return { data, grupoId };
       });
 
       doc.autoTable({
-        startY: 65,
-        head: [['Nome','Reserva','Trecho','Documento']],
+        startY: 71,
+        head: [colHeaders],
         body: tableRows.map(r => r.data),
         styles: {
           fontSize: 9,
-          cellPadding: 6,
+          cellPadding: 7,
           font: 'helvetica',
           textColor: [40,40,40],
           lineColor: [220,220,220],
           lineWidth: 0.3,
+          overflow: 'linebreak',
         },
         headStyles: {
           fillColor: [245,245,245],
@@ -741,28 +803,21 @@ function exportarPDFLista() {
           fontSize: 8,
           halign: 'left',
         },
-        columnStyles: {
-          0: { cellWidth: 180 },
-          1: { cellWidth: 70,  halign: 'center' },
-          2: { cellWidth: 220 },
-          3: { cellWidth: 'auto' },
-        },
+        columnStyles: colWidths,
         didParseCell: function(data) {
           if(data.section === 'body') {
-            const res = tableRows[data.row.index]?.reserva || '';
-            const ci  = coresIdx[res];
+            const { grupoId } = tableRows[data.row.index] || {};
+            const ci = corDoGrupo[grupoId];
             if(ci !== undefined) {
-              const bg  = hexToRgb(PALETTE[ci]);
-              const txt = hexToRgb(PALETTE_TEXT[ci]);
-              data.cell.styles.fillColor  = bg;
-              data.cell.styles.textColor  = txt;
-              data.cell.styles.fontStyle  = 'bold';
+              data.cell.styles.fillColor = hexToRgb(PALETTE[ci]);
+              data.cell.styles.textColor = hexToRgb(PALETTE_TEXT[ci]);
+              data.cell.styles.fontStyle = 'bold';
             } else {
               data.cell.styles.fillColor = data.row.index%2===0 ? [255,255,255] : [250,250,250];
             }
           }
         },
-        margin: { left: 30, right: 30 },
+        margin: { left: 32, right: 32 },
       });
     });
 
