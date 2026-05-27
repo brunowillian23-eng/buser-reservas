@@ -26,8 +26,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-bg); color: var(--dark); min-height: 100vh; }
-
-  /* NAV */
+ 
   nav {
     background: var(--white);
     border-bottom: 1px solid var(--gray-border);
@@ -41,314 +40,115 @@
     z-index: 100;
     box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   }
-  .nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-  }
-  .nav-logo-mark {
-    width: 36px;
-    height: 36px;
-    background: var(--pink);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .nav-logo span {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--dark);
-    letter-spacing: -0.3px;
-  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .nav-logo-mark { width: 36px; height: 36px; background: var(--pink); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .nav-logo span { font-size: 18px; font-weight: 700; color: var(--dark); letter-spacing: -0.3px; }
   .nav-logo span em { color: var(--pink); font-style: normal; }
   .nav-divider { width: 1px; height: 24px; background: var(--gray-border); }
   .nav-subtitle { font-size: 13px; color: var(--gray-text); }
-  .nav-badge {
-    margin-left: auto;
-    background: var(--pink-bg);
-    color: var(--pink);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-    border: 1px solid var(--pink-light);
-    letter-spacing: 0.3px;
-  }
-
-  /* HERO */
-  .hero {
-    background: linear-gradient(135deg, var(--pink-dark) 0%, var(--pink) 60%, #D81B60 100%);
-    padding: 40px 32px 36px;
-    color: var(--white);
-  }
+  .nav-badge { margin-left: auto; background: var(--pink-bg); color: var(--pink); font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--pink-light); letter-spacing: 0.3px; }
+ 
+  .hero { background: linear-gradient(135deg, var(--pink-dark) 0%, var(--pink) 60%, #D81B60 100%); padding: 40px 32px 36px; color: var(--white); }
   .hero-inner { max-width: 1100px; margin: 0 auto; }
   .hero h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.5px; }
   .hero p { font-size: 15px; opacity: 0.85; }
-  .hero-tabs {
-    display: flex;
-    gap: 8px;
-    margin-top: 24px;
-  }
-  .hero-tab {
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.25);
-    color: #fff;
-    padding: 8px 18px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .hero-tab.active, .hero-tab:hover {
-    background: rgba(255,255,255,0.28);
-    border-color: rgba(255,255,255,0.5);
-  }
-
-  /* CONTAINER */
+  .hero-tabs { display: flex; gap: 8px; margin-top: 24px; }
+  .hero-tab { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); color: #fff; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+  .hero-tab.active, .hero-tab:hover { background: rgba(255,255,255,0.28); border-color: rgba(255,255,255,0.5); }
+ 
   .container { max-width: 1100px; margin: 0 auto; padding: 28px 32px; }
-
-  /* SECTIONS */
   .section { display: none; }
   .section.active { display: block; }
-
-  /* CARDS */
-  .card {
-    background: var(--white);
-    border-radius: 14px;
-    border: 1px solid var(--gray-border);
-    padding: 24px;
-    margin-bottom: 20px;
-  }
-  .card-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 18px;
-  }
-  .card-title .icon {
-    width: 36px; height: 36px;
-    background: var(--pink-bg);
-    border-radius: 9px;
-    display: flex; align-items: center; justify-content: center;
-  }
+ 
+  .card { background: var(--white); border-radius: 14px; border: 1px solid var(--gray-border); padding: 24px; margin-bottom: 20px; }
+  .card-title { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .card-title .icon { width: 36px; height: 36px; background: var(--pink-bg); border-radius: 9px; display: flex; align-items: center; justify-content: center; }
   .card-title .icon svg { color: var(--pink); }
   .card-title h2 { font-size: 15px; font-weight: 600; }
   .card-title p { font-size: 12px; color: var(--gray-text); margin-top: 1px; }
-
-  /* DROP ZONE */
-  .drop-zone {
-    border: 2px dashed var(--pink-light);
-    border-radius: 10px;
-    padding: 36px;
-    text-align: center;
-    cursor: pointer;
-    background: var(--pink-bg);
-    transition: all 0.2s;
-  }
-  .drop-zone:hover, .drop-zone.drag {
-    border-color: var(--pink);
-    background: #FCE4EC;
-  }
+ 
+  .drop-zone { border: 2px dashed var(--pink-light); border-radius: 10px; padding: 36px; text-align: center; cursor: pointer; background: var(--pink-bg); transition: all 0.2s; }
+  .drop-zone:hover, .drop-zone.drag { border-color: var(--pink); background: #FCE4EC; }
   .drop-zone h3 { font-size: 14px; font-weight: 600; color: var(--dark); margin-bottom: 5px; }
   .drop-zone p { font-size: 12px; color: var(--gray-text); margin-bottom: 16px; }
-
-  /* BUTTONS */
-  .btn {
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 9px 20px; border-radius: 9px;
-    font-size: 13px; font-weight: 600; cursor: pointer;
-    border: none; transition: all 0.15s;
-    text-decoration: none;
-  }
+ 
+  .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 20px; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; text-decoration: none; }
   .btn-pink { background: var(--pink); color: #fff; }
   .btn-pink:hover { background: var(--pink-dark); }
   .btn-pink:disabled { background: var(--pink-light); color: #fff; cursor: not-allowed; }
-  .btn-outline {
-    background: var(--white); color: var(--dark);
-    border: 1px solid var(--gray-border);
-  }
+  .btn-outline { background: var(--white); color: var(--dark); border: 1px solid var(--gray-border); }
   .btn-outline:hover { background: var(--gray-bg); border-color: #ccc; }
-
-  /* SELECTS CONFIG */
-  .config-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 12px;
-    margin-bottom: 16px;
-  }
+ 
+  .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
   .config-grid label { font-size: 11px; font-weight: 600; color: var(--gray-text); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
-  .config-grid select {
-    width: 100%; padding: 8px 10px;
-    border: 1px solid var(--gray-border); border-radius: 8px;
-    font-size: 13px; background: var(--gray-bg);
-    color: var(--dark);
-  }
-
-  /* STATS */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-  .stat-card {
-    background: var(--white);
-    border: 1px solid var(--gray-border);
-    border-radius: 12px;
-    padding: 14px 16px;
-  }
+  .config-grid select { width: 100%; padding: 8px 10px; border: 1px solid var(--gray-border); border-radius: 8px; font-size: 13px; background: var(--gray-bg); color: var(--dark); }
+ 
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .stat-card { background: var(--white); border: 1px solid var(--gray-border); border-radius: 12px; padding: 14px 16px; }
   .stat-card .lbl { font-size: 11px; color: var(--gray-text); font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; }
   .stat-card .val { font-size: 28px; font-weight: 700; color: var(--pink); margin-top: 2px; }
-
-  /* ACTIONS BAR */
-  .actions-bar {
-    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
-    margin-bottom: 16px;
-  }
-  .actions-bar input[type="text"] {
-    padding: 8px 12px; border: 1px solid var(--gray-border);
-    border-radius: 9px; font-size: 13px; min-width: 200px;
-    background: var(--white);
-  }
-
-  /* TABLE */
-  #export-area {
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid var(--gray-border);
-    background: var(--white);
-  }
-  .export-header {
-    background: var(--pink);
-    padding: 14px 20px;
-    display: flex; align-items: center; gap: 12px;
-  }
-  .export-header .eh-icon {
-    width: 34px; height: 34px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-  }
+ 
+  .actions-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+  .actions-bar input[type="text"] { padding: 8px 12px; border: 1px solid var(--gray-border); border-radius: 9px; font-size: 13px; min-width: 200px; background: var(--white); }
+ 
+  #export-area { border-radius: 12px; overflow: hidden; border: 1px solid var(--gray-border); background: var(--white); }
+  .export-header { background: var(--pink); padding: 14px 20px; display: flex; align-items: center; gap: 12px; }
+  .export-header .eh-icon { width: 34px; height: 34px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
   .export-header h2 { color: #fff; font-size: 14px; font-weight: 600; }
   .export-header p { color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 1px; }
-
+ 
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   thead tr { background: #FAFAFA; }
-  thead th {
-    padding: 10px 16px; text-align: left;
-    font-weight: 600; font-size: 11px; color: var(--gray-text);
-    border-bottom: 1px solid var(--gray-border);
-    text-transform: uppercase; letter-spacing: 0.5px;
-  }
+  thead th { padding: 10px 16px; text-align: left; font-weight: 600; font-size: 11px; color: var(--gray-text); border-bottom: 1px solid var(--gray-border); text-transform: uppercase; letter-spacing: 0.5px; }
   tbody td { padding: 9px 16px; border-bottom: 1px solid #F5F5F5; }
-
-  /* LEGEND */
-  .legend-box {
-    background: var(--white); border-radius: 12px;
-    border: 1px solid var(--gray-border);
-    padding: 14px 18px; margin-top: 16px;
-  }
-  .legend-box .legend-lbl {
-    font-size: 11px; font-weight: 600; color: var(--gray-text);
-    text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 10px;
-  }
+ 
+  .legend-box { background: var(--white); border-radius: 12px; border: 1px solid var(--gray-border); padding: 14px 18px; margin-top: 16px; }
+  .legend-box .legend-lbl { font-size: 11px; font-weight: 600; color: var(--gray-text); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 10px; }
   .legend-items { display: flex; flex-wrap: wrap; gap: 7px; }
-  .legend-badge {
-    padding: 4px 12px; border-radius: 20px;
-    font-size: 12px; font-weight: 600;
-    border: 1px solid transparent;
-  }
-
-  /* MERGE FILE LIST */
+  .legend-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid transparent; }
+ 
   .file-list { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
-  .file-item {
-    background: var(--white); border: 1px solid var(--gray-border);
-    border-radius: 9px; padding: 10px 14px;
-    display: flex; align-items: center; gap: 10px;
-    cursor: grab; user-select: none; transition: box-shadow 0.15s;
-  }
+  .file-item { background: var(--white); border: 1px solid var(--gray-border); border-radius: 9px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; cursor: grab; user-select: none; transition: box-shadow 0.15s; }
   .file-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.07); border-color: #ccc; }
   .file-item.dragging { opacity: 0.35; }
   .file-item.drag-over { border-color: var(--pink); background: var(--pink-bg); }
-  .file-icon {
-    width: 32px; height: 32px; border-radius: 7px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700; flex-shrink: 0;
-  }
+  .file-icon { width: 32px; height: 32px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
   .file-icon.pdf { background: #FFEBEE; color: var(--danger); }
   .file-icon.img { background: #E3F2FD; color: #1565C0; }
   .file-name { flex: 1; font-size: 13px; color: var(--dark); }
   .file-size { font-size: 11px; color: #bbb; }
-  .btn-remove {
-    background: none; border: none; cursor: pointer;
-    color: #ccc; font-size: 18px; line-height: 1; padding: 0 4px;
-  }
+  .btn-remove { background: none; border: none; cursor: pointer; color: #ccc; font-size: 18px; line-height: 1; padding: 0 4px; }
   .btn-remove:hover { color: var(--danger); }
   .drag-handle { color: #ccc; cursor: grab; font-size: 15px; }
-
-  .progress-wrap {
-    height: 5px; background: var(--gray-border);
-    border-radius: 3px; overflow: hidden; display: none; margin: 12px 0;
-  }
+ 
+  .progress-wrap { height: 5px; background: var(--gray-border); border-radius: 3px; overflow: hidden; display: none; margin: 12px 0; }
   .progress-bar { height: 100%; background: var(--pink); width: 0%; transition: width 0.2s; border-radius: 3px; }
-
-  /* TOAST */
-  .toast {
-    position: fixed; bottom: 24px; right: 24px;
-    background: var(--success); color: #fff;
-    padding: 12px 18px; border-radius: 10px;
-    font-size: 13px; font-weight: 500;
-    display: none; align-items: center; gap: 8px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 999;
-  }
+ 
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--success); color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 999; }
   .toast.error { background: var(--danger); }
-
+ 
   .hidden { display: none !important; }
-
-  /* AUTOCOMPLETE */
+ 
   .ac-wrap { position: relative; flex: 1; }
   .ac-wrap input { width: 100%; }
-  .ac-dropdown {
-    position: absolute; top: calc(100% + 4px); left: 0; right: 0;
-    background: #fff; border: 1px solid var(--gray-border);
-    border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-    z-index: 200; max-height: 220px; overflow-y: auto; display: none;
-  }
+  .ac-dropdown { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border: 1px solid var(--gray-border); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 200; max-height: 220px; overflow-y: auto; display: none; }
   .ac-dropdown.open { display: block; }
-  .ac-item {
-    padding: 9px 14px; font-size: 13px; cursor: pointer;
-    border-bottom: 1px solid #f5f5f5; display: flex; flex-direction: column; gap: 2px;
-  }
+  .ac-item { padding: 9px 14px; font-size: 13px; cursor: pointer; border-bottom: 1px solid #f5f5f5; display: flex; flex-direction: column; gap: 2px; }
   .ac-item:last-child { border-bottom: none; }
   .ac-item:hover, .ac-item.selected { background: var(--pink-bg); }
   .ac-item .ac-main { font-weight: 500; color: var(--dark); }
   .ac-item .ac-sub { font-size: 11px; color: var(--gray-text); }
   .ac-item .ac-mark { color: var(--pink); font-weight: 700; }
-
-  .hint-tag {
-    display: inline-block; background: var(--pink-bg); color: var(--pink);
-    font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
-    margin-top: 6px; cursor: pointer; border: 1px solid var(--pink-light);
-  }
+ 
+  .hint-tag { display: inline-block; background: var(--pink-bg); color: var(--pink); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: 6px; cursor: pointer; border: 1px solid var(--pink-light); }
   .hint-tag:hover { background: #FCE4EC; }
-
   .field-wrap { display: flex; flex-direction: column; }
-
   .hint-empresas { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-
-  .hint-endereco {
-    margin-top: 6px; padding: 8px 12px; background: var(--pink-bg);
-    border: 1px solid var(--pink-light); border-radius: 8px;
-    font-size: 12px; color: var(--pink-dark); display: none;
-  }
+  .hint-endereco { margin-top: 6px; padding: 8px 12px; background: var(--pink-bg); border: 1px solid var(--pink-light); border-radius: 8px; font-size: 12px; color: var(--pink-dark); display: none; }
 </style>
 </head>
 <body>
-
-<!-- NAV -->
+ 
 <nav>
   <div class="nav-logo">
     <div class="nav-logo-mark">
@@ -365,42 +165,28 @@
   <span class="nav-subtitle">ferramentas internas</span>
   <span class="nav-badge">USO INTERNO</span>
 </nav>
-
-<!-- HERO -->
+ 
 <div class="hero">
   <div class="hero-inner">
     <h1>Central de Operações</h1>
     <p>Gerencie passageiros, agrupe reservas e organize passagens em um só lugar.</p>
     <div class="hero-tabs">
-      <button class="hero-tab active" onclick="switchTab('reservas', this)">
-        🗂 Agrupar Reservas
-      </button>
-      <button class="hero-tab" onclick="switchTab('passagens', this)">
-        📄 Juntar Passagens
-      </button>
-      <button class="hero-tab" onclick="switchTab('jira', this)">
-        📋 Gerar Texto Jira
-      </button>
+      <button class="hero-tab active" onclick="switchTab('reservas', this)">🗂 Agrupar Reservas</button>
+      <button class="hero-tab" onclick="switchTab('passagens', this)">📄 Juntar Passagens</button>
+      <button class="hero-tab" onclick="switchTab('jira', this)">📋 Gerar Texto Jira</button>
     </div>
   </div>
 </div>
-
+ 
 <div class="container">
-
-  <!-- ===== SEÇÃO 1: RESERVAS ===== -->
+ 
+  <!-- SEÇÃO 1: RESERVAS -->
   <div id="tab-reservas" class="section active">
-
     <div class="card">
       <div class="card-title">
-        <div class="icon">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        </div>
-        <div>
-          <h2>Importar planilha de passageiros</h2>
-          <p>Formatos aceitos: XLS, XLSX, CSV</p>
-        </div>
+        <div class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+        <div><h2>Importar planilha de passageiros</h2><p>Formatos aceitos: XLS, XLSX, CSV</p></div>
       </div>
-
       <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
         <svg width="40" height="40" fill="none" stroke="#AD1457" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="display:block;margin:0 auto 12px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         <h3>Arraste a planilha aqui</h3>
@@ -409,16 +195,11 @@
         <button class="btn btn-pink" onclick="event.stopPropagation(); document.getElementById('file-input').click()">Selecionar arquivo</button>
       </div>
     </div>
-
+ 
     <div class="card hidden" id="config-section">
       <div class="card-title">
-        <div class="icon">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
-        </div>
-        <div>
-          <h2>Configurar colunas</h2>
-          <p>Confirme quais colunas correspondem a cada campo</p>
-        </div>
+        <div class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg></div>
+        <div><h2>Configurar colunas</h2><p>Confirme quais colunas correspondem a cada campo</p></div>
       </div>
       <div class="config-grid">
         <div><label>Nome do passageiro</label><select id="col-nome"></select></div>
@@ -430,14 +211,14 @@
       </div>
       <button class="btn btn-pink" onclick="gerarTabela()">Gerar tabela agrupada</button>
     </div>
-
+ 
     <div class="stats-grid hidden" id="stats-section">
       <div class="stat-card"><div class="lbl">Passageiros</div><div class="val" id="stat-passageiros">—</div></div>
       <div class="stat-card"><div class="lbl">Reservas únicas</div><div class="val" id="stat-reservas">—</div></div>
       <div class="stat-card"><div class="lbl">Grupos (2+)</div><div class="val" id="stat-grupos">—</div></div>
       <div class="stat-card"><div class="lbl">Sozinhos</div><div class="val" id="stat-solo">—</div></div>
     </div>
-
+ 
     <div class="actions-bar hidden" id="actions-section">
       <button class="btn btn-pink" id="btn-png" onclick="exportarPNG()">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -457,16 +238,11 @@
       </button>
       <input type="text" placeholder="Filtrar por nome, trecho..." oninput="filtrarTabela(this.value)">
     </div>
-
+ 
     <div id="export-area" class="hidden">
       <div class="export-header">
-        <div class="eh-icon">
-          <svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8l5 4-5 4"/><circle cx="5.5" cy="18.5" r="1.5"/><circle cx="14.5" cy="18.5" r="1.5"/></svg>
-        </div>
-        <div>
-          <h2 id="export-title">Lista de Passageiros</h2>
-          <p id="export-subtitle"></p>
-        </div>
+        <div class="eh-icon"><svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8l5 4-5 4"/><circle cx="5.5" cy="18.5" r="1.5"/><circle cx="14.5" cy="18.5" r="1.5"/></svg></div>
+        <div><h2 id="export-title">Lista de Passageiros</h2><p id="export-subtitle"></p></div>
       </div>
       <div style="overflow-x:auto;">
         <table id="result-table">
@@ -475,28 +251,20 @@
         </table>
       </div>
     </div>
-
+ 
     <div class="legend-box hidden" id="legend">
       <div class="legend-lbl">Legenda — grupos com 2 ou mais pessoas na mesma reserva</div>
       <div class="legend-items" id="legend-items"></div>
     </div>
-
-  </div><!-- /tab-reservas -->
-
-  <!-- ===== SEÇÃO 2: JUNTAR PASSAGENS ===== -->
+  </div>
+ 
+  <!-- SEÇÃO 2: JUNTAR PASSAGENS -->
   <div id="tab-passagens" class="section">
-
     <div class="card">
       <div class="card-title">
-        <div class="icon">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-        </div>
-        <div>
-          <h2>Juntar passagens em um único PDF</h2>
-          <p>Suba PDFs e imagens, ordene arrastando e baixe tudo em um arquivo só</p>
-        </div>
+        <div class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
+        <div><h2>Juntar passagens em um único PDF</h2><p>Suba PDFs e imagens, ordene arrastando e baixe tudo em um arquivo só</p></div>
       </div>
-
       <div class="drop-zone" id="merge-drop" onclick="document.getElementById('merge-input').click()">
         <svg width="40" height="40" fill="none" stroke="#AD1457" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="display:block;margin:0 auto 12px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         <h3>Arraste os arquivos aqui</h3>
@@ -505,125 +273,82 @@
         <button class="btn btn-pink" onclick="event.stopPropagation(); document.getElementById('merge-input').click()">Selecionar arquivos</button>
       </div>
     </div>
-
+ 
     <div class="card hidden" id="merge-card">
       <div class="card-title">
-        <div class="icon">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        </div>
-        <div>
-          <h2>Arquivos selecionados</h2>
-          <p id="merge-count-label">Arraste para reordenar antes de gerar</p>
-        </div>
+        <div class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+        <div><h2>Arquivos selecionados</h2><p id="merge-count-label">Arraste para reordenar antes de gerar</p></div>
       </div>
-
       <div id="merge-file-list" class="file-list"></div>
       <div class="progress-wrap" id="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
-
       <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:4px;">
         <button class="btn btn-pink" id="btn-merge" onclick="juntarPDFs()">Gerar PDF unificado</button>
         <button class="btn btn-outline" onclick="limparMerge()">Limpar tudo</button>
         <span style="font-size:12px; color:var(--gray-text);" id="merge-status"></span>
       </div>
     </div>
-
-  </div><!-- /tab-passagens -->
-
-  <!-- ===== SEÇÃO 3: GERADOR JIRA ===== -->
+  </div>
+ 
+  <!-- SEÇÃO 3: GERADOR JIRA -->
   <div id="tab-jira" class="section">
-
     <div class="card">
       <div class="card-title">
-        <div class="icon">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
-        </div>
-        <div>
-          <h2>Gerador de texto para Jira</h2>
-          <p>Preencha os campos e copie o texto pronto para colar no chamado</p>
-        </div>
+        <div class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg></div>
+        <div><h2>Gerador de texto para Jira</h2><p>Preencha os campos e copie o texto pronto para colar no chamado</p></div>
       </div>
-
-      <!-- FORMULÁRIO -->
+ 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
-
+ 
         <div style="grid-column:1/-1;">
           <label style="font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">Trecho</label>
           <div style="display:flex;align-items:flex-start;gap:10px;">
             <div class="ac-wrap field-wrap">
-              <input id="jira-origem" type="text" placeholder="Cidade de origem (ex: Belo Horizonte-MG)"
-                oninput="acInput(this,'cidade','jira-origem')" onkeydown="acKey(event,'jira-origem')"
-                autocomplete="off"
-                style="padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
+              <input id="jira-origem" type="text" placeholder="Cidade de origem (ex: Belo Horizonte-MG)" oninput="acInput(this,'cidade','jira-origem')" onkeydown="acKey(event,'jira-origem')" autocomplete="off" style="padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
               <div class="ac-dropdown" id="ac-jira-origem"></div>
             </div>
             <span style="color:var(--pink);font-weight:700;font-size:22px;flex-shrink:0;margin-top:7px;">→</span>
             <div class="ac-wrap field-wrap">
-              <input id="jira-destino" type="text" placeholder="Cidade de destino (ex: Rio de Janeiro-RJ)"
-                oninput="acInput(this,'cidade','jira-destino')" onkeydown="acKey(event,'jira-destino')"
-                autocomplete="off"
-                style="padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
+              <input id="jira-destino" type="text" placeholder="Cidade de destino (ex: Rio de Janeiro-RJ)" oninput="acInput(this,'cidade','jira-destino')" onkeydown="acKey(event,'jira-destino')" autocomplete="off" style="padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
               <div class="ac-dropdown" id="ac-jira-destino"></div>
             </div>
           </div>
         </div>
-
+ 
         <div>
           <label style="font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">Horário de embarque</label>
-          <input id="jira-horario" type="time" oninput="gerarTextoJira()"
-            style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
+          <input id="jira-horario" type="time" oninput="gerarTextoJira()" style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
         </div>
-
+ 
         <div class="field-wrap">
           <label style="font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">Empresa (viação)</label>
           <div class="ac-wrap">
-            <input id="jira-empresa" type="text" placeholder="ex: Cometa, Util, Gontijo..."
-              oninput="acInput(this,'empresa','jira-empresa')" onkeydown="acKey(event,'jira-empresa')"
-              autocomplete="off"
-              style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
+            <input id="jira-empresa" type="text" placeholder="ex: Cometa, Util, Gontijo..." oninput="acInput(this,'empresa','jira-empresa')" onkeydown="acKey(event,'jira-empresa')" autocomplete="off" style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
             <div class="ac-dropdown" id="ac-jira-empresa"></div>
           </div>
           <div class="hint-empresas" id="hint-empresas-main"></div>
         </div>
-
+ 
         <div class="field-wrap" style="grid-column:1/-1;">
           <label style="font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">Endereço da rodoviária</label>
-          <div class="ac-wrap">
-            <input id="jira-endereco" type="text" placeholder="Preenchido automaticamente ou digite manualmente"
-              oninput="gerarTextoJira()"
-              autocomplete="off"
-              style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;background:#fafafa;">
-          </div>
-          <div class="hint-endereco" id="hint-endereco-main"></div>
+          <input id="jira-endereco" type="text" placeholder="Digite o endereço manualmente" oninput="gerarTextoJira()" autocomplete="off" style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;background:#fafafa;">
         </div>
-
+ 
       </div>
-
-      <!-- BOTÃO ADICIONAR TRECHO -->
+ 
       <button class="btn btn-outline" onclick="adicionarTrecho()" style="margin-bottom:20px;">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Adicionar outro trecho
       </button>
-
-      <!-- TRECHOS EXTRAS -->
+ 
       <div id="jira-trechos-extras"></div>
-
     </div>
-
-    <!-- PREVIEW DO TEXTO -->
+ 
     <div class="card" id="jira-preview-card" style="display:none;">
       <div class="card-title">
-        <div class="icon">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-        </div>
-        <div>
-          <h2>Texto gerado</h2>
-          <p>Revise e copie para o chamado no Jira</p>
-        </div>
+        <div class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></div>
+        <div><h2>Texto gerado</h2><p>Revise e copie para o chamado no Jira</p></div>
       </div>
-
-      <div id="jira-preview"
-        style="background:var(--gray-bg);border:1px solid var(--gray-border);border-radius:10px;padding:18px 20px;font-size:14px;line-height:1.8;color:var(--dark);white-space:pre-wrap;font-family:inherit;min-height:80px;"></div>
-
+      <div id="jira-preview" style="background:var(--gray-bg);border:1px solid var(--gray-border);border-radius:10px;padding:18px 20px;font-size:14px;line-height:1.8;color:var(--dark);white-space:pre-wrap;font-family:inherit;min-height:80px;"></div>
       <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
         <button class="btn btn-pink" onclick="copiarTextoJira()" id="btn-copiar-jira">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
@@ -635,15 +360,12 @@
         </button>
       </div>
     </div>
-
-  </div><!-- /tab-jira -->
-
-</div><!-- /container -->
-
-<div class="toast" id="toast">
-  ✓ <span id="toast-text">Salvo!</span>
+  </div>
+ 
 </div>
-
+ 
+<div class="toast" id="toast">✓ <span id="toast-text">Salvo!</span></div>
+ 
 <script>
 // ===== TAB SWITCH =====
 function switchTab(tab, el) {
@@ -652,219 +374,99 @@ function switchTab(tab, el) {
   document.querySelectorAll('.hero-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
 }
-
-// ===== BANCO DE DADOS: CIDADES, EMPRESAS E RODOVIÁRIAS =====
+ 
+// ===== BANCO DE DADOS =====
 const DB_CIDADES = [
-  { nome: 'São Paulo-SP',        uf: 'SP' },
-  { nome: 'Rio de Janeiro-RJ',   uf: 'RJ' },
-  { nome: 'Belo Horizonte-MG',   uf: 'MG' },
-  { nome: 'Campinas-SP',         uf: 'SP' },
-  { nome: 'Curitiba-PR',         uf: 'PR' },
-  { nome: 'Porto Alegre-RS',     uf: 'RS' },
-  { nome: 'Salvador-BA',         uf: 'BA' },
-  { nome: 'Recife-PE',           uf: 'PE' },
-  { nome: 'Fortaleza-CE',        uf: 'CE' },
-  { nome: 'Manaus-AM',           uf: 'AM' },
-  { nome: 'Brasília-DF',         uf: 'DF' },
-  { nome: 'Goiânia-GO',          uf: 'GO' },
-  { nome: 'Florianópolis-SC',    uf: 'SC' },
-  { nome: 'Vitória-ES',          uf: 'ES' },
-  { nome: 'Maceió-AL',           uf: 'AL' },
-  { nome: 'Natal-RN',            uf: 'RN' },
-  { nome: 'Teresina-PI',         uf: 'PI' },
-  { nome: 'Campo Grande-MS',     uf: 'MS' },
-  { nome: 'Cuiabá-MT',           uf: 'MT' },
-  { nome: 'Belém-PA',            uf: 'PA' },
-  { nome: 'Macapá-AP',           uf: 'AP' },
-  { nome: 'Porto Velho-RO',      uf: 'RO' },
-  { nome: 'Rio Branco-AC',       uf: 'AC' },
-  { nome: 'Boa Vista-RR',        uf: 'RR' },
-  { nome: 'Palmas-TO',           uf: 'TO' },
-  { nome: 'São Luís-MA',         uf: 'MA' },
-  { nome: 'João Pessoa-PB',      uf: 'PB' },
-  { nome: 'Aracaju-SE',          uf: 'SE' },
-  { nome: 'Uberlândia-MG',       uf: 'MG' },
-  { nome: 'Ribeirão Preto-SP',   uf: 'SP' },
-  { nome: 'Santos-SP',           uf: 'SP' },
-  { nome: 'São José dos Campos-SP', uf: 'SP' },
-  { nome: 'Sorocaba-SP',         uf: 'SP' },
-  { nome: 'Londrina-PR',         uf: 'PR' },
-  { nome: 'Maringá-PR',          uf: 'PR' },
-  { nome: 'Joinville-SC',        uf: 'SC' },
-  { nome: 'Blumenau-SC',         uf: 'SC' },
-  { nome: 'Juiz de Fora-MG',     uf: 'MG' },
-  { nome: 'Contagem-MG',         uf: 'MG' },
-  { nome: 'Montes Claros-MG',    uf: 'MG' },
-  { nome: 'Diamantina-MG',       uf: 'MG' },
-  { nome: 'Governador Valadares-MG', uf: 'MG' },
-  { nome: 'Ipatinga-MG',         uf: 'MG' },
-  { nome: 'Sete Lagoas-MG',      uf: 'MG' },
-  { nome: 'Divinópolis-MG',      uf: 'MG' },
-  { nome: 'Poços de Caldas-MG',  uf: 'MG' },
-  { nome: 'Barbacena-MG',        uf: 'MG' },
-  { nome: 'Patos de Minas-MG',   uf: 'MG' },
-  { nome: 'Teófilo Otoni-MG',    uf: 'MG' },
-  { nome: 'Uberaba-MG',          uf: 'MG' },
-  { nome: 'Curvelo-MG',          uf: 'MG' },
-  { nome: 'Conselheiro Lafaiete-MG', uf: 'MG' },
-  { nome: 'Caratinga-MG',        uf: 'MG' },
-  { nome: 'Araxá-MG',            uf: 'MG' },
-  { nome: 'Passos-MG',           uf: 'MG' },
-  { nome: 'Itabira-MG',          uf: 'MG' },
-  { nome: 'Feira de Santana-BA', uf: 'BA' },
-  { nome: 'Caruaru-PE',          uf: 'PE' },
-  { nome: 'Campina Grande-PB',   uf: 'PB' },
-  { nome: 'Mossoró-RN',          uf: 'RN' },
-  { nome: 'Imperatriz-MA',       uf: 'MA' },
-  { nome: 'Caraguatatuba-SP',    uf: 'SP' },
-  { nome: 'Guarulhos-SP',        uf: 'SP' },
-  { nome: 'Osasco-SP',           uf: 'SP' },
-  { nome: 'Santo André-SP',      uf: 'SP' },
-  { nome: 'São Bernardo do Campo-SP', uf: 'SP' },
-  { nome: 'Bauru-SP',            uf: 'SP' },
-  { nome: 'Piracicaba-SP',       uf: 'SP' },
-  { nome: 'São José do Rio Preto-SP', uf: 'SP' },
-  { nome: 'Arapiraca-AL',        uf: 'AL' },
-  { nome: 'Novo Lino-AL',        uf: 'AL' },
-  { nome: 'Palmeira dos Índios-AL', uf: 'AL' },
+  { nome: 'São Paulo-SP' }, { nome: 'Rio de Janeiro-RJ' }, { nome: 'Belo Horizonte-MG' },
+  { nome: 'Campinas-SP' }, { nome: 'Curitiba-PR' }, { nome: 'Porto Alegre-RS' },
+  { nome: 'Salvador-BA' }, { nome: 'Recife-PE' }, { nome: 'Fortaleza-CE' },
+  { nome: 'Manaus-AM' }, { nome: 'Brasília-DF' }, { nome: 'Goiânia-GO' },
+  { nome: 'Florianópolis-SC' }, { nome: 'Vitória-ES' }, { nome: 'Maceió-AL' },
+  { nome: 'Natal-RN' }, { nome: 'Teresina-PI' }, { nome: 'Campo Grande-MS' },
+  { nome: 'Cuiabá-MT' }, { nome: 'Belém-PA' }, { nome: 'Macapá-AP' },
+  { nome: 'Porto Velho-RO' }, { nome: 'Rio Branco-AC' }, { nome: 'Boa Vista-RR' },
+  { nome: 'Palmas-TO' }, { nome: 'São Luís-MA' }, { nome: 'João Pessoa-PB' },
+  { nome: 'Aracaju-SE' }, { nome: 'Uberlândia-MG' }, { nome: 'Ribeirão Preto-SP' },
+  { nome: 'Santos-SP' }, { nome: 'São José dos Campos-SP' }, { nome: 'Sorocaba-SP' },
+  { nome: 'Londrina-PR' }, { nome: 'Maringá-PR' }, { nome: 'Joinville-SC' },
+  { nome: 'Blumenau-SC' }, { nome: 'Juiz de Fora-MG' }, { nome: 'Contagem-MG' },
+  { nome: 'Montes Claros-MG' }, { nome: 'Diamantina-MG' }, { nome: 'Governador Valadares-MG' },
+  { nome: 'Ipatinga-MG' }, { nome: 'Sete Lagoas-MG' }, { nome: 'Divinópolis-MG' },
+  { nome: 'Poços de Caldas-MG' }, { nome: 'Barbacena-MG' }, { nome: 'Patos de Minas-MG' },
+  { nome: 'Teófilo Otoni-MG' }, { nome: 'Uberaba-MG' }, { nome: 'Curvelo-MG' },
+  { nome: 'Conselheiro Lafaiete-MG' }, { nome: 'Caratinga-MG' }, { nome: 'Araxá-MG' },
+  { nome: 'Passos-MG' }, { nome: 'Itabira-MG' }, { nome: 'Feira de Santana-BA' },
+  { nome: 'Caruaru-PE' }, { nome: 'Campina Grande-PB' }, { nome: 'Mossoró-RN' },
+  { nome: 'Imperatriz-MA' }, { nome: 'Caraguatatuba-SP' }, { nome: 'Guarulhos-SP' },
+  { nome: 'Osasco-SP' }, { nome: 'Santo André-SP' }, { nome: 'São Bernardo do Campo-SP' },
+  { nome: 'Bauru-SP' }, { nome: 'Piracicaba-SP' }, { nome: 'São José do Rio Preto-SP' },
+  { nome: 'Arapiraca-AL' }, { nome: 'Novo Lino-AL' }, { nome: 'Palmeira dos Índios-AL' },
 ];
-
+ 
 const DB_EMPRESAS = [
-  'Gontijo', 'Cometa', 'Util', 'Kaissara', 'Águia Branca',
-  'Itapemirim', 'Pássaro Marron', 'Nacional Expresso', 'Expresso do Sul',
-  'Penha', 'Planalto', 'JBL', 'Real Expresso', 'Viação Garcia',
-  'Auto Viação Catarinense', 'Eucatur', 'Expresso Brasileiro',
-  'Santo Anjo', 'Univar', 'Rápido Ribeirense', 'São Luís',
-  'Transbrasiliana', 'Expresso Nordeste', 'Progresso',
-  'Viação Motta', 'Expresso Guanabara', 'Viação Ouro e Prata',
-  'Buser', 'Lirabus', 'Viação Riodoce',
+  'Gontijo','Cometa','Util','Kaissara','Águia Branca','Itapemirim',
+  'Pássaro Marron','Nacional Expresso','Expresso do Sul','Penha','Planalto',
+  'JBL','Real Expresso','Viação Garcia','Auto Viação Catarinense','Eucatur',
+  'Expresso Brasileiro','Santo Anjo','Univar','Rápido Ribeirense','São Luís',
+  'Transbrasiliana','Expresso Nordeste','Progresso','Viação Motta',
+  'Expresso Guanabara','Viação Ouro e Prata','Buser','Lirabus','Viação Riodoce',
 ];
-
-const DB_RODOVIARIAS = {
-  'São Paulo-SP':        { end: 'Praça Júlio Prestes, s/n - Luz, São Paulo - SP, 01218-020' },
-  'Rio de Janeiro-RJ':   { end: 'Av. Francisco Bicalho, 1 - Santo Cristo, Rio de Janeiro - RJ, 20220-310' },
-  'Belo Horizonte-MG':   { end: 'Praça Rio Branco, 100 - Centro, Belo Horizonte - MG, 30110-002' },
-  'Campinas-SP':         { end: 'R. Dr. Campos Sales, 101 - Centro, Campinas - SP, 13010-040' },
-  'Curitiba-PR':         { end: 'Av. Afonso Camargo, 330 - Jardim Botânico, Curitiba - PR, 80060-090' },
-  'Porto Alegre-RS':     { end: 'Largo Vespasiano Julio Veppo, 10 - Floresta, Porto Alegre - RS, 90220-270' },
-  'Salvador-BA':         { end: 'Av. Antônio Carlos Magalhães, s/n - Iguatemi, Salvador - BA, 41825-000' },
-  'Recife-PE':           { end: 'Praça Gal. Cordeiro de Farias, s/n - Boa Vista, Recife - PE, 50070-280' },
-  'Fortaleza-CE':        { end: 'Av. Borges de Melo, 1630 - Fátima, Fortaleza - CE, 60415-640' },
-  'Brasília-DF':         { end: 'ST de Clubes Esportivos Sul Trecho 2, Conjunto 22 - Asa Sul, Brasília - DF, 70322-915' },
-  'Goiânia-GO':          { end: 'R. 44, 399 - Vila Nova, Goiânia - GO, 74645-080' },
-  'Florianópolis-SC':    { end: 'R. Antônio Edu Vieira, 1490 - Pantanal, Florianópolis - SC, 88040-001' },
-  'Vitória-ES':          { end: 'Av. Jerônimo Monteiro, 101 - Centro, Vitória - ES, 29010-002' },
-  'Uberlândia-MG':       { end: 'Av. João Naves de Ávila, 657 - Brasil, Uberlândia - MG, 38400-398' },
-  'Ribeirão Preto-SP':   { end: 'R. Dr. Celso Charuri, 90 - Vila Tibério, Ribeirão Preto - SP, 14050-060' },
-  'Londrina-PR':         { end: 'Av. Dom Pedro II, 98 - Centro, Londrina - PR, 86010-150' },
-  'Joinville-SC':        { end: 'R. Paraíba, 260 - Anita Garibaldi, Joinville - SC, 89203-015' },
-  'Juiz de Fora-MG':     { end: 'Av. Brasil, 4001 - Barreira do Triunfo, Juiz de Fora - MG, 36092-020' },
-  'Montes Claros-MG':    { end: 'Av. Dr. Carlos Versiani Gomes, 699 - Augusta Mota, Montes Claros - MG, 39401-115' },
-  'Diamantina-MG':       { end: 'Av. Silvio Felício dos Santos, s/n - Mercês, Diamantina - MG, 39100-000' },
-  'Sete Lagoas-MG':      { end: 'Av. Prefeito Alberto Moura, 7001 - Eldorado, Sete Lagoas - MG, 35700-388' },
-  'Santos-SP':           { end: 'Praça dos Andradas, s/n - Centro, Santos - SP, 11010-905' },
-  'Maceió-AL':           { end: 'R. Dr. Aristides Maltez, s/n - Fernão Velho, Maceió - AL, 57030-020' },
-  'Natal-RN':            { end: 'Av. Capitão Mor Gouveia, 1237 - Cidade da Esperança, Natal - RN, 59071-010' },
-  'Feira de Santana-BA': { end: 'R. Senhor dos Passos, s/n - Centro, Feira de Santana - BA, 44001-090' },
-  'Caruaru-PE':          { end: 'Av. José Rufino, s/n - Indianópolis, Caruaru - PE, 55014-260' },
-  'Caraguatatuba-SP':    { end: 'R. São João, 120 - Poiares, Caraguatatuba - SP, 11660-300' },
-  'Guarulhos-SP':        { end: 'Av. Brigadeiro Faria Lima, 3565 - Jardim Munhoz, Guarulhos - SP, 07016-100' },
-  'Bauru-SP':            { end: 'Praça Dr. Sidélio Munia, 1 - Centro, Bauru - SP, 17010-230' },
-  'Barbacena-MG':        { end: 'Av. Bias Fortes, 100 - Floresta, Barbacena - MG, 36202-020' },
-  'Governador Valadares-MG': { end: 'Av. Minas Gerais, 51 - Centro, Gov. Valadares - MG, 35010-170' },
-  'Conselheiro Lafaiete-MG': { end: 'Rua Rodovias Federais, s/n - São Caetano, Conselheiro Lafaiete - MG, 36400-000' },
-  'Curvelo-MG':          { end: 'Av. Getúlio Vargas, 800 - Centro, Curvelo - MG, 35790-000' },
-  'Campo Grande-MS':     { end: 'R. Joaquim Nabuco, 200 - Monte Castelo, Campo Grande - MS, 79010-100' },
-  'Belém-PA':            { end: 'Av. Almirante Barroso, 3565 - Marco, Belém - PA, 66093-020' },
-  'Manaus-AM':           { end: 'R. Recife, s/n - Flores, Manaus - AM, 69058-030' },
-  'Campina Grande-PB':   { end: 'Av. Sen. Argemiro de Figueiredo, s/n - Itararé, Campina Grande - PB, 58411-020' },
-};
-
-// ===== AUTOCOMPLETE ENGINE =====
+ 
+// ===== AUTOCOMPLETE =====
 let acState = {};
-
+ 
 function acInput(input, tipo, inputId) {
   const q = input.value.trim().toLowerCase();
   const drop = document.getElementById('ac-' + inputId);
   gerarTextoJira();
-
   if(q.length < 1) { drop.classList.remove('open'); return; }
-
+ 
   let items = [];
   if(tipo === 'cidade') {
-    items = DB_CIDADES
-      .filter(c => c.nome.toLowerCase().includes(q))
-      .slice(0, 8)
-      .map(c => ({ label: c.nome, sub: null }));
+    items = DB_CIDADES.filter(c => c.nome.toLowerCase().includes(q)).slice(0,8).map(c => ({ label: c.nome }));
   } else if(tipo === 'empresa') {
-    items = DB_EMPRESAS
-      .filter(e => e.toLowerCase().includes(q))
-      .slice(0, 8)
-      .map(e => ({ label: e, sub: null }));
+    items = DB_EMPRESAS.filter(e => e.toLowerCase().includes(q)).slice(0,8).map(e => ({ label: e }));
     renderHintEmpresas(inputId);
   }
-
   if(items.length === 0) { drop.classList.remove('open'); return; }
-
+ 
   acState[inputId] = { items, selected: -1 };
   drop.innerHTML = items.map((item, i) => {
     const mark = item.label.replace(new RegExp(`(${q})`, 'gi'), '<span class="ac-mark">$1</span>');
-    return `<div class="ac-item" data-i="${i}" onmousedown="acSelect('${inputId}', ${i})">
-      <span class="ac-main">${mark}</span>
-      ${item.sub ? `<span class="ac-sub">${item.sub}</span>` : ''}
-    </div>`;
+    return `<div class="ac-item" data-i="${i}" onmousedown="acSelect('${inputId}', ${i})"><span class="ac-main">${mark}</span></div>`;
   }).join('');
   drop.classList.add('open');
-
-  document.onclick = (e) => {
-    if(!drop.contains(e.target) && e.target !== input) drop.classList.remove('open');
-  };
+  document.onclick = (e) => { if(!drop.contains(e.target) && e.target !== input) drop.classList.remove('open'); };
 }
-
+ 
 function acKey(e, inputId) {
   const drop = document.getElementById('ac-' + inputId);
   const state = acState[inputId];
   if(!state || !drop.classList.contains('open')) return;
-  if(e.key === 'ArrowDown') {
-    e.preventDefault();
-    state.selected = Math.min(state.selected + 1, state.items.length - 1);
-    acHighlight(drop, state.selected);
-  } else if(e.key === 'ArrowUp') {
-    e.preventDefault();
-    state.selected = Math.max(state.selected - 1, 0);
-    acHighlight(drop, state.selected);
-  } else if(e.key === 'Enter' && state.selected >= 0) {
-    e.preventDefault();
-    acSelect(inputId, state.selected);
-  } else if(e.key === 'Escape') {
-    drop.classList.remove('open');
-  }
+  if(e.key === 'ArrowDown') { e.preventDefault(); state.selected = Math.min(state.selected+1, state.items.length-1); acHighlight(drop, state.selected); }
+  else if(e.key === 'ArrowUp') { e.preventDefault(); state.selected = Math.max(state.selected-1, 0); acHighlight(drop, state.selected); }
+  else if(e.key === 'Enter' && state.selected >= 0) { e.preventDefault(); acSelect(inputId, state.selected); }
+  else if(e.key === 'Escape') { drop.classList.remove('open'); }
 }
-
+ 
 function acHighlight(drop, idx) {
-  drop.querySelectorAll('.ac-item').forEach((el, i) => {
-    el.classList.toggle('selected', i === idx);
-  });
+  drop.querySelectorAll('.ac-item').forEach((el, i) => el.classList.toggle('selected', i === idx));
 }
-
+ 
 function acSelect(inputId, idx) {
   const state = acState[inputId];
   if(!state) return;
   const item = state.items[idx];
   document.getElementById(inputId).value = item.label;
   document.getElementById('ac-' + inputId).classList.remove('open');
-
-
-
   if(inputId.startsWith('jira-empresa')) {
     const sufixo = inputId.replace('jira-empresa', '');
     const hintId = sufixo === '' ? 'hint-empresas-main' : `hint-empresas${sufixo}`;
     renderHintEmpresas(inputId, hintId);
   }
-
   gerarTextoJira();
 }
-
+ 
 function renderHintEmpresas(inputId, hintId) {
   hintId = hintId || (inputId === 'jira-empresa' ? 'hint-empresas-main' : 'hint-empresas-' + inputId.replace('jira-empresa-',''));
   const el = document.getElementById(hintId);
@@ -877,24 +479,24 @@ function renderHintEmpresas(inputId, hintId) {
     el.appendChild(tag);
   });
 }
-
+ 
 let trechosExtras = [];
-
+ 
 function formatarHorario(val) {
   if(!val) return '(horário)';
   const [h, m] = val.split(':');
   return `${h}h${m !== '00' ? m : ''}`;
 }
-
+ 
+// ===== GERAR TEXTO JIRA =====
 function gerarTextoJira() {
   const origem   = document.getElementById('jira-origem').value.trim();
   const destino  = document.getElementById('jira-destino').value.trim();
   const horario  = document.getElementById('jira-horario').value;
   const empresa  = document.getElementById('jira-empresa').value.trim();
   const endereco = document.getElementById('jira-endereco').value.trim();
-
-  const trecho = origem && destino ? `${origem} → ${destino}` : (origem || destino || '');
-
+  const trecho   = origem && destino ? `${origem} → ${destino}` : (origem || destino || '');
+ 
   let blocos = [];
   if(trecho || horario || empresa || endereco) {
     blocos.push(montarBloco(
@@ -904,33 +506,24 @@ function gerarTextoJira() {
       endereco || '(endereço da rodoviária)'
     ));
   }
-
+ 
   trechosExtras.forEach((_, i) => {
-    const o = document.getElementById(`jira-trecho-${i}`)?.value.trim()  || '';
-    const d = document.getElementById(`jira-destino-${i}`)?.value.trim() || '';
-    const h = document.getElementById(`jira-horario-${i}`)?.value        || '';
-    const e = document.getElementById(`jira-empresa-${i}`)?.value.trim() || '';
+    const o   = document.getElementById(`jira-trecho-${i}`)?.value.trim()   || '';
+    const d   = document.getElementById(`jira-destino-${i}`)?.value.trim()  || '';
+    const h   = document.getElementById(`jira-horario-${i}`)?.value         || '';
+    const e   = document.getElementById(`jira-empresa-${i}`)?.value.trim()  || '';
     const end = document.getElementById(`jira-endereco-${i}`)?.value.trim() || '';
-    const t = o && d ? `${o} → ${d}` : (o || d || '');
+    const t   = o && d ? `${o} → ${d}` : (o || d || '');
     if(t || h || e || end) {
-      blocos.push(montarBloco(
-        t   || '(trecho)',
-        h   || '',
-        e   || '(empresa)',
-        end || '(endereço da rodoviária)'
-      ));
+      blocos.push(montarBloco(t || '(trecho)', h || '', e || '(empresa)', end || '(endereço da rodoviária)'));
     }
   });
-
-  if(blocos.length === 0) {
-    document.getElementById('jira-preview-card').style.display = 'none';
-    return;
-  }
-
+ 
+  if(blocos.length === 0) { document.getElementById('jira-preview-card').style.display = 'none'; return; }
   document.getElementById('jira-preview').textContent = blocos.join('\n\n---\n\n');
   document.getElementById('jira-preview-card').style.display = 'block';
 }
-
+ 
 function montarBloco(trecho, horario, empresa, endereco) {
   const h = formatarHorario(horario);
   return `Por favor, informem aos passageiros do trecho: ${trecho}
@@ -938,7 +531,7 @@ Que compramos passagem rodoviária para o seguimento da viagem (ou realização 
 Solicitar que retirem as passagens no guichê da Viação ${empresa} com 1h de antecedência, portando documento em mãos.
 Endereço da rodoviária: ${endereco}.`;
 }
-
+ 
 function adicionarTrecho() {
   const idx = trechosExtras.length;
   trechosExtras.push(idx);
@@ -949,85 +542,64 @@ function adicionarTrecho() {
   div.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <span style="font-size:12px;font-weight:600;color:var(--pink);text-transform:uppercase;letter-spacing:.4px;">Trecho ${idx + 2}</span>
-      <button onclick="removerTrecho(${idx})" style="background:none;border:none;cursor:pointer;color:#aaa;font-size:18px;line-height:1;" title="Remover">×</button>
+      <button onclick="removerTrecho(${idx})" style="background:none;border:none;cursor:pointer;color:#aaa;font-size:18px;line-height:1;">×</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-
       <div style="grid-column:1/-1;">
         <label style="font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">Trecho</label>
         <div style="display:flex;align-items:flex-start;gap:10px;">
           <div class="ac-wrap">
-            <input id="jira-trecho-${idx}" type="text" placeholder="Cidade de origem"
-              oninput="acInput(this,'cidade','jira-trecho-${idx}')" onkeydown="acKey(event,'jira-trecho-${idx}')"
-              autocomplete="off"
-              style="padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
+            <input id="jira-trecho-${idx}" type="text" placeholder="Cidade de origem" oninput="acInput(this,'cidade','jira-trecho-${idx}')" onkeydown="acKey(event,'jira-trecho-${idx}')" autocomplete="off" style="padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
             <div class="ac-dropdown" id="ac-jira-trecho-${idx}"></div>
           </div>
           <span style="color:var(--pink);font-weight:700;font-size:22px;flex-shrink:0;margin-top:7px;">→</span>
           <div class="ac-wrap">
-            <input id="jira-destino-${idx}" type="text" placeholder="Cidade de destino"
-              oninput="acInput(this,'cidade','jira-destino-${idx}')" onkeydown="acKey(event,'jira-destino-${idx}')"
-              autocomplete="off"
-              style="padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
+            <input id="jira-destino-${idx}" type="text" placeholder="Cidade de destino" oninput="acInput(this,'cidade','jira-destino-${idx}')" onkeydown="acKey(event,'jira-destino-${idx}')" autocomplete="off" style="padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
             <div class="ac-dropdown" id="ac-jira-destino-${idx}"></div>
           </div>
         </div>
       </div>
-
       <div>
         <label style="font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">Horário de embarque</label>
-        <input id="jira-horario-${idx}" type="time" oninput="gerarTextoJira()"
-          style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
+        <input id="jira-horario-${idx}" type="time" oninput="gerarTextoJira()" style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
       </div>
-
       <div class="field-wrap">
         <label style="font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">Empresa (viação)</label>
         <div class="ac-wrap">
-          <input id="jira-empresa-${idx}" type="text" placeholder="ex: Cometa, Util, Gontijo..."
-            oninput="acInput(this,'empresa','jira-empresa-${idx}')" onkeydown="acKey(event,'jira-empresa-${idx}')"
-            autocomplete="off"
-            style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
+          <input id="jira-empresa-${idx}" type="text" placeholder="ex: Cometa, Util, Gontijo..." oninput="acInput(this,'empresa','jira-empresa-${idx}')" onkeydown="acKey(event,'jira-empresa-${idx}')" autocomplete="off" style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
           <div class="ac-dropdown" id="ac-jira-empresa-${idx}"></div>
         </div>
         <div class="hint-empresas" id="hint-empresas-${idx}"></div>
       </div>
-
       <div class="field-wrap" style="grid-column:1/-1;">
         <label style="font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">Endereço da rodoviária</label>
-        <input id="jira-endereco-${idx}" type="text" placeholder="Preenchido automaticamente ou digite manualmente"
-          oninput="gerarTextoJira()"
-          autocomplete="off"
-          style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;background:#fafafa;">
-        <div class="hint-endereco" id="hint-endereco-${idx}"></div>
+        <input id="jira-endereco-${idx}" type="text" placeholder="Digite o endereço manualmente" oninput="gerarTextoJira()" autocomplete="off" style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;background:#fafafa;">
       </div>
-
     </div>`;
   container.appendChild(div);
 }
-
+ 
 function removerTrecho(idx) {
   document.getElementById(`trecho-extra-${idx}`)?.remove();
   trechosExtras = trechosExtras.filter(i => i !== idx);
   gerarTextoJira();
 }
-
+ 
 function copiarTextoJira() {
   const texto = document.getElementById('jira-preview').textContent;
   const btn = document.getElementById('btn-copiar-jira');
-
   const confirmar = () => {
     btn.textContent = '✓ Copiado!';
     setTimeout(() => { btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copiar texto'; }, 2000);
     mostrarToast('Texto copiado para a área de transferência!', false);
   };
-
   if(navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(texto).then(confirmar).catch(() => copiarFallback(texto, confirmar));
   } else {
     copiarFallback(texto, confirmar);
   }
 }
-
+ 
 function copiarFallback(texto, callback) {
   const ta = document.createElement('textarea');
   ta.value = texto;
@@ -1035,29 +607,21 @@ function copiarFallback(texto, callback) {
   document.body.appendChild(ta);
   ta.focus();
   ta.select();
-  try {
-    document.execCommand('copy');
-    if(callback) callback();
-  } catch(e) {
-    mostrarToast('Não foi possível copiar. Selecione o texto manualmente.', true);
-  }
+  try { document.execCommand('copy'); if(callback) callback(); }
+  catch(e) { mostrarToast('Não foi possível copiar. Selecione o texto manualmente.', true); }
   document.body.removeChild(ta);
 }
-
+ 
 function limparJira() {
-  document.getElementById('jira-origem').value   = '';
-  document.getElementById('jira-destino').value  = '';
-  document.getElementById('jira-horario').value  = '';
-  document.getElementById('jira-empresa').value  = '';
-  document.getElementById('jira-endereco').value = '';
+  ['jira-origem','jira-destino','jira-horario','jira-empresa','jira-endereco'].forEach(id => { document.getElementById(id).value = ''; });
   document.getElementById('jira-trechos-extras').innerHTML = '';
   trechosExtras = [];
   document.getElementById('jira-preview-card').style.display = 'none';
 }
-
+ 
 // ===== RESERVAS =====
-let dadosTabela = [], colunas = [], coloresReserva = {}, nomeArquivo = 'reservas';
-
+let dadosTabela = [], colunas = [], nomeArquivo = 'reservas', removidos = [];
+ 
 const PALETTE = [
   '#FFF3CD','#D4EDDA','#CCE5FF','#F8D7DA','#D1ECF1',
   '#FDEBD0','#E8DAEF','#D5F5E3','#FADBD8','#D6EAF8',
@@ -1070,15 +634,14 @@ const PALETTE_TEXT = [
   '#1A6C8A','#1E8449','#7D6608','#7B241C','#6C3483',
   '#0E6655','#784212','#444','#1A4C8A','#1A5276'
 ];
-
+ 
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
-
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
 dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag'); if(e.dataTransfer.files[0]) processarArquivo(e.dataTransfer.files[0]); });
 fileInput.addEventListener('change', e => { if(e.target.files[0]) processarArquivo(e.target.files[0]); });
-
+ 
 function processarArquivo(file) {
   nomeArquivo = file.name.replace(/\.[^.]+$/, '');
   const reader = new FileReader();
@@ -1089,8 +652,7 @@ function processarArquivo(file) {
     colunas = json[0].map((c,i) => ({label: String(c||`coluna ${i+1}`), idx: i}));
     dadosTabela = json.slice(1).filter(r => r.some(c => c !== undefined && c !== ''));
     removidos = [];
-    const btnR = document.getElementById('btn-restaurar');
-    if(btnR) btnR.style.display = 'none';
+    document.getElementById('btn-restaurar').style.display = 'none';
     preencherSelects();
     document.getElementById('config-section').classList.remove('hidden');
     document.getElementById('drop-zone').classList.add('hidden');
@@ -1098,7 +660,7 @@ function processarArquivo(file) {
   };
   reader.readAsArrayBuffer(file);
 }
-
+ 
 function preencherSelects() {
   const defaults = {
     'col-nome':['nome','name','passageiro'],
@@ -1114,54 +676,34 @@ function preencherSelects() {
     if(match) sel.value = match.idx;
   });
   const colTipo = colunas.find(c => c.label.toLowerCase().includes('tipo'));
-  const colNum = colunas.find(c => {
-    const l = c.label.toLowerCase();
-    return (l.includes('documento') || l === 'rg' || l === 'cpf') && !l.includes('tipo');
-  });
+  const colNum  = colunas.find(c => { const l = c.label.toLowerCase(); return (l.includes('documento') || l === 'rg' || l === 'cpf') && !l.includes('tipo'); });
   if(colTipo) document.getElementById('col-documento').value = colTipo.idx;
   if(colNum)  document.getElementById('col-numdoc').value = colNum.idx;
-
   const selEmail = document.getElementById('col-email');
-  selEmail.innerHTML = '<option value="-1">— não usar —</option>' +
-    colunas.map(c => `<option value="${c.idx}">${c.label}</option>`).join('');
+  selEmail.innerHTML = '<option value="-1">— não usar —</option>' + colunas.map(c => `<option value="${c.idx}">${c.label}</option>`).join('');
   const colEmail = colunas.find(c => c.label.toLowerCase().includes('email') || c.label.toLowerCase().includes('e-mail') || c.label.toLowerCase().includes('mail'));
   if(colEmail) selEmail.value = colEmail.idx;
 }
-
+ 
 function resolverGruposCor(dadosOrdenados, iReserva, iEmail) {
-  const reservaParaGrupo = {};
-  const emailParaGrupo   = {};
+  const reservaParaGrupo = {}, emailParaGrupo = {};
   let grupoCounter = 0;
-
   dadosOrdenados.forEach(row => {
     const res   = String(row[iReserva]||'').trim();
     const email = iEmail >= 0 ? String(row[iEmail]||'').trim().toLowerCase() : '';
-
     let grupoId = reservaParaGrupo[res];
-    if(grupoId === undefined && email) {
-      grupoId = emailParaGrupo[email];
-    }
-    if(grupoId === undefined) {
-      grupoId = ++grupoCounter;
-    }
+    if(grupoId === undefined && email) grupoId = emailParaGrupo[email];
+    if(grupoId === undefined) grupoId = ++grupoCounter;
     reservaParaGrupo[res] = grupoId;
     if(email) emailParaGrupo[email] = grupoId;
   });
-
   const contagemGrupo = {};
-  dadosOrdenados.forEach(row => {
-    const res = String(row[iReserva]||'').trim();
-    const g   = reservaParaGrupo[res];
-    contagemGrupo[g] = (contagemGrupo[g]||0) + 1;
-  });
-
-  const gruposValidos = Object.keys(contagemGrupo).filter(g => contagemGrupo[g] > 1);
+  dadosOrdenados.forEach(row => { const res = String(row[iReserva]||'').trim(); const g = reservaParaGrupo[res]; contagemGrupo[g] = (contagemGrupo[g]||0) + 1; });
   const corDoGrupo = {};
-  gruposValidos.sort().forEach((g, i) => corDoGrupo[g] = i % PALETTE.length);
-
+  Object.keys(contagemGrupo).filter(g => contagemGrupo[g] > 1).sort().forEach((g, i) => corDoGrupo[g] = i % PALETTE.length);
   return { reservaParaGrupo, corDoGrupo, contagemGrupo };
 }
-
+ 
 function gerarTabela() {
   const iNome    = +document.getElementById('col-nome').value;
   const iReserva = +document.getElementById('col-reserva').value;
@@ -1169,23 +711,14 @@ function gerarTabela() {
   const iDoc     = +document.getElementById('col-documento').value;
   const iNumDoc  = +document.getElementById('col-numdoc').value;
   const iEmail   = +document.getElementById('col-email').value;
-
   const ordenado = [...dadosTabela].sort((a,b) => String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
   const { reservaParaGrupo, corDoGrupo, contagemGrupo } = resolverGruposCor(ordenado, iReserva, iEmail);
-
   const reservasUnicas = new Set(dadosTabela.map(r => String(r[iReserva]||'').trim())).size;
   const gruposComMais  = Object.values(contagemGrupo).filter(v => v > 1).length;
   const gruposSozinhos = Object.values(contagemGrupo).filter(v => v === 1).length;
-
   window._grupoInfo = { reservaParaGrupo, corDoGrupo, contagemGrupo, iEmail };
-
-  const colHeaders = iEmail >= 0
-    ? ['Nome','Reserva','Trecho','E-mail','Documento']
-    : ['Nome','Reserva','Trecho','Documento'];
-
-  document.getElementById('table-head').innerHTML =
-    `<tr>${colHeaders.map(n=>`<th>${n}</th>`).join('')}<th style="width:50px;"></th></tr>`;
-
+  const colHeaders = iEmail >= 0 ? ['Nome','Reserva','Trecho','E-mail','Documento'] : ['Nome','Reserva','Trecho','Documento'];
+  document.getElementById('table-head').innerHTML = `<tr>${colHeaders.map(n=>`<th>${n}</th>`).join('')}<th style="width:50px;"></th></tr>`;
   document.getElementById('table-body').innerHTML = ordenado.map((row, idx) => {
     const res     = String(row[iReserva]||'').trim();
     const grupoId = reservaParaGrupo[res];
@@ -1196,68 +729,47 @@ function gerarTabela() {
     const numDoc  = String(row[iNumDoc]||'').trim();
     const docComb = tipoDoc && numDoc && tipoDoc !== numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
     const emailVal = iEmail >= 0 ? (row[iEmail]||'') : null;
-    const cells   = iEmail >= 0
-      ? [row[iNome], res, row[iTrecho], emailVal, docComb]
-      : [row[iNome], res, row[iTrecho], docComb];
+    const cells   = iEmail >= 0 ? [row[iNome], res, row[iTrecho], emailVal, docComb] : [row[iNome], res, row[iTrecho], docComb];
     const idxOriginal = dadosTabela.indexOf(row);
-    return `<tr data-idx="${idxOriginal}" style="background:${bg}; border-bottom:1px solid #F0F0F0; transition:opacity 0.2s;">
+    return `<tr data-idx="${idxOriginal}" style="background:${bg};border-bottom:1px solid #F0F0F0;transition:opacity 0.2s;">
       ${cells.map(v=>`<td style="padding:9px 16px;color:${color};font-size:13px;">${v||''}</td>`).join('')}
-      <td style="padding:6px 10px; text-align:center;">
-        <button onclick="removerPassageiro(${idxOriginal})" title="Remover passageiro da lista"
-          style="background:none;border:1px solid #ffcccc;border-radius:6px;padding:3px 8px;cursor:pointer;color:#c0392b;font-size:12px;font-weight:600;transition:all 0.15s;"
-          onmouseover="this.style.background='#fff0f0'" onmouseout="this.style.background='none'">✕</button>
+      <td style="padding:6px 10px;text-align:center;">
+        <button onclick="removerPassageiro(${idxOriginal})" title="Remover" style="background:none;border:1px solid #ffcccc;border-radius:6px;padding:3px 8px;cursor:pointer;color:#c0392b;font-size:12px;font-weight:600;" onmouseover="this.style.background='#fff0f0'" onmouseout="this.style.background='none'">✕</button>
       </td>
     </tr>`;
   }).join('');
-
   const hoje = new Date().toLocaleDateString('pt-BR');
   document.getElementById('export-title').textContent = nomeArquivo;
   document.getElementById('export-subtitle').textContent = `${dadosTabela.length} passageiros · ${gruposComMais} grupos identificados · ${hoje}`;
-
   const gruposLegenda = Object.entries(corDoGrupo).sort((a,b)=>+a[0]-+b[0]);
   const reservaPorGrupo = {};
-  Object.entries(reservaParaGrupo).forEach(([res, g]) => {
-    if(!reservaPorGrupo[g]) reservaPorGrupo[g] = [];
-    reservaPorGrupo[g].push(res);
-  });
+  Object.entries(reservaParaGrupo).forEach(([res, g]) => { if(!reservaPorGrupo[g]) reservaPorGrupo[g] = []; reservaPorGrupo[g].push(res); });
   document.getElementById('legend-items').innerHTML = gruposLegenda.map(([g, ci]) => {
     const reservas = [...new Set(reservaPorGrupo[g]||[])].join(', ');
     return `<span class="legend-badge" style="background:${PALETTE[ci]};color:${PALETTE_TEXT[ci]};border-color:${PALETTE_TEXT[ci]}33;">${reservas} (${contagemGrupo[g]})</span>`;
   }).join('');
-
   document.getElementById('stat-passageiros').textContent = dadosTabela.length;
   document.getElementById('stat-reservas').textContent    = reservasUnicas;
   document.getElementById('stat-grupos').textContent      = gruposComMais;
   document.getElementById('stat-solo').textContent        = gruposSozinhos;
-
   ['stats-section','actions-section','export-area'].forEach(id => document.getElementById(id).classList.remove('hidden'));
   document.getElementById('legend').classList[gruposComMais > 0 ? 'remove' : 'add']('hidden');
 }
-
-let removidos = [];
-
+ 
 function removerPassageiro(idxOriginal) {
   const iNome = +document.getElementById('col-nome').value;
   const row = dadosTabela[idxOriginal];
   if(!row) return;
   const nome = String(row[iNome]||'Passageiro').trim();
   if(!confirm(`Remover "${nome}" da lista?\n\nEle não será incluído nas exportações.`)) return;
-
   const trEl = document.querySelector(`#table-body tr[data-idx="${idxOriginal}"]`);
-  if(trEl) {
-    trEl.style.transition = 'opacity 0.25s, transform 0.25s';
-    trEl.style.opacity = '0';
-    trEl.style.transform = 'translateX(20px)';
-    setTimeout(() => trEl.remove(), 260);
-  }
-
+  if(trEl) { trEl.style.transition = 'opacity 0.25s, transform 0.25s'; trEl.style.opacity = '0'; trEl.style.transform = 'translateX(20px)'; setTimeout(() => trEl.remove(), 260); }
   removidos.push({ row, idx: idxOriginal, nome });
   dadosTabela.splice(idxOriginal, 1);
-
   setTimeout(() => { gerarTabela(); atualizarBtnRestaurar(); }, 300);
   mostrarToast(`"${nome}" removido. Use "Restaurar lista" para desfazer.`, false);
 }
-
+ 
 function restaurarTodos() {
   if(removidos.length === 0) return;
   removidos.forEach(item => dadosTabela.push(item.row));
@@ -1266,24 +778,18 @@ function restaurarTodos() {
   atualizarBtnRestaurar();
   mostrarToast('Lista restaurada com todos os passageiros.', false);
 }
-
+ 
 function atualizarBtnRestaurar() {
-  const btn   = document.getElementById('btn-restaurar');
+  const btn = document.getElementById('btn-restaurar');
   const count = document.getElementById('btn-restaurar-count');
-  if(removidos.length > 0) {
-    btn.style.display = 'inline-flex';
-    count.textContent = removidos.length;
-  } else {
-    btn.style.display = 'none';
-  }
+  if(removidos.length > 0) { btn.style.display = 'inline-flex'; count.textContent = removidos.length; }
+  else { btn.style.display = 'none'; }
 }
-
+ 
 function filtrarTabela(txt) {
-  document.querySelectorAll('#table-body tr').forEach(r => {
-    r.style.display = r.textContent.toLowerCase().includes(txt.toLowerCase()) ? '' : 'none';
-  });
+  document.querySelectorAll('#table-body tr').forEach(r => { r.style.display = r.textContent.toLowerCase().includes(txt.toLowerCase()) ? '' : 'none'; });
 }
-
+ 
 function exportarPNG() {
   const btn = document.getElementById('btn-png');
   btn.disabled = true; btn.textContent = 'Gerando...';
@@ -1295,316 +801,158 @@ function exportarPNG() {
     a.download = `reservas_${d}.png`; a.href = canvas.toDataURL('image/png'); a.click();
     btn.disabled = false; btn.textContent = 'Exportar PNG';
     mostrarToast(`reservas_${d}.png salvo!`, false);
-  }).catch(() => {
-    document.querySelectorAll('#table-body td:last-child, #table-head th:last-child').forEach(el => el.style.display='');
-    btn.disabled = false; btn.textContent = 'Exportar PNG'; mostrarToast('Erro ao gerar PNG.', true);
-  });
+  }).catch(() => { document.querySelectorAll('#table-body td:last-child, #table-head th:last-child').forEach(el => el.style.display=''); btn.disabled = false; btn.textContent = 'Exportar PNG'; mostrarToast('Erro ao gerar PNG.', true); });
 }
-
-function hexToRgb(hex) {
-  const r = parseInt(hex.slice(1,3),16);
-  const g = parseInt(hex.slice(3,5),16);
-  const b = parseInt(hex.slice(5,7),16);
-  return [r,g,b];
-}
-
+ 
+function hexToRgb(hex) { return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)]; }
+ 
 function exportarPDFLista() {
   const btn = document.getElementById('btn-pdf-lista');
   btn.disabled = true; btn.textContent = 'Gerando...';
   try {
-    const iNome    = +document.getElementById('col-nome').value;
-    const iReserva = +document.getElementById('col-reserva').value;
-    const iTrecho  = +document.getElementById('col-trecho').value;
-    const iDoc     = +document.getElementById('col-documento').value;
-    const iNumDoc  = +document.getElementById('col-numdoc').value;
-    const iEmail   = +document.getElementById('col-email').value;
-
+    const iNome = +document.getElementById('col-nome').value, iReserva = +document.getElementById('col-reserva').value;
+    const iTrecho = +document.getElementById('col-trecho').value, iDoc = +document.getElementById('col-documento').value;
+    const iNumDoc = +document.getElementById('col-numdoc').value, iEmail = +document.getElementById('col-email').value;
     const ordenado = [...dadosTabela].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
     const { reservaParaGrupo, corDoGrupo, contagemGrupo } = resolverGruposCor(ordenado, iReserva, iEmail);
-
-    const porTrecho = {};
-    const ordemTrecho = [];
-    ordenado.forEach(row => {
-      const trecho = String(row[iTrecho]||'Sem trecho').trim();
-      if(!porTrecho[trecho]) { porTrecho[trecho] = []; ordemTrecho.push(trecho); }
-      porTrecho[trecho].push(row);
-    });
-
+    const porTrecho = {}, ordemTrecho = [];
+    ordenado.forEach(row => { const t = String(row[iTrecho]||'Sem trecho').trim(); if(!porTrecho[t]) { porTrecho[t] = []; ordemTrecho.push(t); } porTrecho[t].push(row); });
     const { jsPDF } = window.jspdf;
-    const doc  = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a3' });
+    const doc = new jsPDF({ orientation:'landscape', unit:'pt', format:'a3' });
     const hoje = new Date().toLocaleDateString('pt-BR');
-    const pageW = doc.internal.pageSize.getWidth();
-    const pageH = doc.internal.pageSize.getHeight();
-    const margem = 32;
-
+    const pageW = doc.internal.pageSize.getWidth(), pageH = doc.internal.pageSize.getHeight(), margem = 32;
     const temEmail = iEmail >= 0;
-    const colHeaders = temEmail
-      ? ['Nome','Reserva','Trecho','E-mail','Documento']
-      : ['Nome','Reserva','Trecho','Documento'];
-    const colWidths = temEmail
-      ? { 0:220, 1:80, 2:240, 3:190, 4:'auto' }
-      : { 0:260, 1:90, 2:300, 3:'auto' };
-
-    doc.setFillColor(173, 20, 87);
-    doc.rect(0, 0, pageW, 46, 'F');
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(20); doc.setFont('helvetica','bold');
-    doc.text('buser', margem, 31);
-    doc.setFontSize(13); doc.setFont('helvetica','normal');
-    doc.text('Lista de Passageiros', pageW/2, 31, {align:'center'});
-    doc.setFontSize(9);
-    doc.text(hoje, pageW - margem, 31, {align:'right'});
-
-    doc.setFillColor(248, 187, 217);
-    doc.rect(0, 46, pageW, 20, 'F');
-    doc.setTextColor(136, 14, 79);
-    doc.setFontSize(9); doc.setFont('helvetica','bold');
+    const colHeaders = temEmail ? ['Nome','Reserva','Trecho','E-mail','Documento'] : ['Nome','Reserva','Trecho','Documento'];
+    const colWidths  = temEmail ? {0:220,1:80,2:240,3:190,4:'auto'} : {0:260,1:90,2:300,3:'auto'};
+    doc.setFillColor(173,20,87); doc.rect(0,0,pageW,46,'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(20); doc.setFont('helvetica','bold'); doc.text('buser',margem,31);
+    doc.setFontSize(13); doc.setFont('helvetica','normal'); doc.text('Lista de Passageiros',pageW/2,31,{align:'center'});
+    doc.setFontSize(9); doc.text(hoje,pageW-margem,31,{align:'right'});
+    doc.setFillColor(248,187,217); doc.rect(0,46,pageW,20,'F');
+    doc.setTextColor(136,14,79); doc.setFontSize(9); doc.setFont('helvetica','bold');
     const totalGrupos = Object.values(contagemGrupo).filter(v=>v>1).length;
-    doc.text(`${dadosTabela.length} passageiros  ·  ${ordemTrecho.length} trecho(s)  ·  ${totalGrupos} grupo(s) identificado(s)`, margem, 59);
-
+    doc.text(`${dadosTabela.length} passageiros  ·  ${ordemTrecho.length} trecho(s)  ·  ${totalGrupos} grupo(s) identificado(s)`,margem,59);
     let cursorY = 70;
-
     ordemTrecho.forEach((trecho, tIdx) => {
       const linhas = porTrecho[trecho];
-      const gruposNaTela = new Set(linhas.map(l => reservaParaGrupo[String(l[iReserva]||'').trim()]));
-      const qtdGrupos = [...gruposNaTela].filter(g => contagemGrupo[g] > 1).length;
-
-      if(tIdx > 0 && cursorY + 50 > pageH - 30) {
-        doc.addPage();
-        cursorY = 20;
-      }
-
-      const barH = 28;
+      const qtdGrupos = [...new Set(linhas.map(l => reservaParaGrupo[String(l[iReserva]||'').trim()]))].filter(g => contagemGrupo[g] > 1).length;
+      if(tIdx > 0 && cursorY + 50 > pageH - 30) { doc.addPage(); cursorY = 20; }
       if(tIdx > 0) cursorY += 10;
-
-      doc.setFillColor(173, 20, 87);
-      doc.roundedRect(margem, cursorY, pageW - margem*2, barH, 4, 4, 'F');
-      doc.setTextColor(255,255,255);
-      doc.setFontSize(10); doc.setFont('helvetica','bold');
-      doc.text(trecho, margem + 12, cursorY + 18);
-      doc.setFontSize(8); doc.setFont('helvetica','normal');
-      doc.text(`${linhas.length} passageiro(s)  ·  ${qtdGrupos} grupo(s)`, pageW - margem - 12, cursorY + 18, {align:'right'});
-
-      cursorY += barH + 2;
-
+      doc.setFillColor(173,20,87); doc.roundedRect(margem,cursorY,pageW-margem*2,28,4,4,'F');
+      doc.setTextColor(255,255,255); doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.text(trecho,margem+12,cursorY+18);
+      doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.text(`${linhas.length} passageiro(s)  ·  ${qtdGrupos} grupo(s)`,pageW-margem-12,cursorY+18,{align:'right'});
+      cursorY += 30;
       const tableRows = linhas.map(row => {
-        const res     = String(row[iReserva]||'').trim();
-        const tipoDoc = String(row[iDoc]||'').trim();
-        const numDoc  = String(row[iNumDoc]||'').trim();
+        const res = String(row[iReserva]||'').trim();
+        const tipoDoc = String(row[iDoc]||'').trim(), numDoc = String(row[iNumDoc]||'').trim();
         const docComb = tipoDoc && numDoc && tipoDoc !== numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
-        const emailV  = temEmail ? String(row[iEmail]||'').trim() : null;
-        const grupoId = reservaParaGrupo[res];
-        const data    = temEmail
-          ? [row[iNome]||'', res, row[iTrecho]||'', emailV||'', docComb]
-          : [row[iNome]||'', res, row[iTrecho]||'', docComb];
-        return { data, grupoId };
+        const emailV = temEmail ? String(row[iEmail]||'').trim() : null;
+        const data = temEmail ? [row[iNome]||'',res,row[iTrecho]||'',emailV||'',docComb] : [row[iNome]||'',res,row[iTrecho]||'',docComb];
+        return { data, grupoId: reservaParaGrupo[res] };
       });
-
       doc.autoTable({
-        startY: cursorY,
-        head: [colHeaders],
-        body: tableRows.map(r => r.data),
-        styles: {
-          fontSize: 9,
-          cellPadding: 6,
-          font: 'helvetica',
-          textColor: [40,40,40],
-          lineColor: [220,220,220],
-          lineWidth: 0.3,
-          overflow: 'linebreak',
-        },
-        headStyles: {
-          fillColor: [240,240,240],
-          textColor: [100,100,100],
-          fontStyle: 'bold',
-          fontSize: 8,
-          halign: 'left',
-        },
+        startY: cursorY, head: [colHeaders], body: tableRows.map(r => r.data),
+        styles: { fontSize:9, cellPadding:6, font:'helvetica', textColor:[40,40,40], lineColor:[220,220,220], lineWidth:0.3, overflow:'linebreak' },
+        headStyles: { fillColor:[240,240,240], textColor:[100,100,100], fontStyle:'bold', fontSize:8, halign:'left' },
         columnStyles: colWidths,
         didParseCell: function(data) {
           if(data.section === 'body') {
             const { grupoId } = tableRows[data.row.index] || {};
             const ci = corDoGrupo[grupoId];
-            if(ci !== undefined) {
-              data.cell.styles.fillColor = hexToRgb(PALETTE[ci]);
-              data.cell.styles.textColor = hexToRgb(PALETTE_TEXT[ci]);
-              data.cell.styles.fontStyle = 'bold';
-            } else {
-              data.cell.styles.fillColor = data.row.index%2===0 ? [255,255,255] : [250,250,250];
-            }
+            if(ci !== undefined) { data.cell.styles.fillColor = hexToRgb(PALETTE[ci]); data.cell.styles.textColor = hexToRgb(PALETTE_TEXT[ci]); data.cell.styles.fontStyle = 'bold'; }
+            else { data.cell.styles.fillColor = data.row.index%2===0 ? [255,255,255] : [250,250,250]; }
           }
         },
-        margin: { left: margem, right: margem },
-        showHead: 'everyPage',
+        margin: { left:margem, right:margem }, showHead: 'everyPage',
       });
-
       cursorY = doc.lastAutoTable.finalY + 6;
     });
-
     const d = new Date().toISOString().slice(0,10);
     doc.save(`reservas_${d}.pdf`);
     btn.disabled = false; btn.textContent = 'Exportar PDF';
     mostrarToast(`reservas_${d}.pdf salvo!`, false);
-  } catch(err) {
-    btn.disabled = false; btn.textContent = 'Exportar PDF';
-    mostrarToast('Erro: ' + err.message, true);
-    console.error(err);
-  }
+  } catch(err) { btn.disabled = false; btn.textContent = 'Exportar PDF'; mostrarToast('Erro: '+err.message, true); console.error(err); }
 }
-
+ 
 async function exportarXLSX() {
   const btn = document.querySelector('button[onclick="exportarXLSX()"]');
   btn.disabled = true; btn.textContent = 'Gerando...';
   try {
-    const iNome    = +document.getElementById('col-nome').value;
-    const iReserva = +document.getElementById('col-reserva').value;
-    const iTrecho  = +document.getElementById('col-trecho').value;
-    const iDoc     = +document.getElementById('col-documento').value;
-    const iNumDoc  = +document.getElementById('col-numdoc').value;
-    const iEmail   = +document.getElementById('col-email').value;
+    const iNome = +document.getElementById('col-nome').value, iReserva = +document.getElementById('col-reserva').value;
+    const iTrecho = +document.getElementById('col-trecho').value, iDoc = +document.getElementById('col-documento').value;
+    const iNumDoc = +document.getElementById('col-numdoc').value, iEmail = +document.getElementById('col-email').value;
     const temEmail = iEmail >= 0;
-
     const ordenado = [...dadosTabela].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
     const { reservaParaGrupo, corDoGrupo, contagemGrupo } = resolverGruposCor(ordenado, iReserva, iEmail);
-
-    const porTrecho = {};
-    const ordemTrecho = [];
-    ordenado.forEach(row => {
-      const t = String(row[iTrecho]||'Sem trecho').trim();
-      if(!porTrecho[t]) { porTrecho[t] = []; ordemTrecho.push(t); }
-      porTrecho[t].push(row);
-    });
-
-    const wb  = new ExcelJS.Workbook();
-    wb.creator = 'Buser';
-    wb.created = new Date();
-    const ws  = wb.addWorksheet('Passageiros');
-
+    const porTrecho = {}, ordemTrecho = [];
+    ordenado.forEach(row => { const t = String(row[iTrecho]||'Sem trecho').trim(); if(!porTrecho[t]) { porTrecho[t]=[]; ordemTrecho.push(t); } porTrecho[t].push(row); });
+    const wb = new ExcelJS.Workbook(); wb.creator='Buser'; wb.created=new Date();
+    const ws = wb.addWorksheet('Passageiros');
     const lastCol = temEmail ? 'E' : 'D';
-
-    ws.columns = temEmail
-      ? [{width:38},{width:12},{width:36},{width:30},{width:22}]
-      : [{width:38},{width:12},{width:36},{width:22}];
-
+    ws.columns = temEmail ? [{width:38},{width:12},{width:36},{width:30},{width:22}] : [{width:38},{width:12},{width:36},{width:22}];
     const toArgb = hex => 'FF' + hex.replace('#','').toUpperCase();
-
     const hoje = new Date().toLocaleDateString('pt-BR');
     const totalGrupos = Object.values(contagemGrupo).filter(v=>v>1).length;
-    const cabecalhoGeral = ws.addRow([`buser — Lista de Passageiros · ${dadosTabela.length} passageiros · ${ordemTrecho.length} trecho(s) · ${totalGrupos} grupo(s) · ${hoje}`]);
-    ws.mergeCells(`A1:${lastCol}1`);
-    cabecalhoGeral.height = 26;
-    cabecalhoGeral.getCell(1).font      = { bold:true, color:{argb:'FFFFFFFF'}, size:12 };
-    cabecalhoGeral.getCell(1).fill      = { type:'pattern', pattern:'solid', fgColor:{argb:'FFAD1457'} };
-    cabecalhoGeral.getCell(1).alignment = { horizontal:'center', vertical:'middle' };
-
+    const cabRow = ws.addRow([`buser — Lista de Passageiros · ${dadosTabela.length} passageiros · ${ordemTrecho.length} trecho(s) · ${totalGrupos} grupo(s) · ${hoje}`]);
+    ws.mergeCells(`A1:${lastCol}1`); cabRow.height=26;
+    cabRow.getCell(1).font={bold:true,color:{argb:'FFFFFFFF'},size:12}; cabRow.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFAD1457'}}; cabRow.getCell(1).alignment={horizontal:'center',vertical:'middle'};
     ws.addRow([]);
-
-    const headers = temEmail
-      ? ['Nome','Reserva','Trecho','E-mail','Documento']
-      : ['Nome','Reserva','Trecho','Documento'];
-
+    const headers = temEmail ? ['Nome','Reserva','Trecho','E-mail','Documento'] : ['Nome','Reserva','Trecho','Documento'];
     ordemTrecho.forEach((trecho, tIdx) => {
       const linhas = porTrecho[trecho];
-      const gruposNaTela = new Set(linhas.map(l => reservaParaGrupo[String(l[iReserva]||'').trim()]));
-      const qtdGrupos = [...gruposNaTela].filter(g => contagemGrupo[g] > 1).length;
-
+      const qtdGrupos = [...new Set(linhas.map(l => reservaParaGrupo[String(l[iReserva]||'').trim()]))].filter(g => contagemGrupo[g] > 1).length;
       const sepRow = ws.addRow([`${trecho}   ·   ${linhas.length} passageiro(s)   ·   ${qtdGrupos} grupo(s)`]);
-      const sepRowNum = sepRow.number;
-      ws.mergeCells(`A${sepRowNum}:${lastCol}${sepRowNum}`);
-      sepRow.height = 22;
-      sepRow.getCell(1).font      = { bold:true, color:{argb:'FFFFFFFF'}, size:10 };
-      sepRow.getCell(1).fill      = { type:'pattern', pattern:'solid', fgColor:{argb:'FFAD1457'} };
-      sepRow.getCell(1).alignment = { horizontal:'left', vertical:'middle', indent:1 };
-
-      const hRow = ws.addRow(headers);
-      hRow.height = 16;
-      hRow.eachCell(cell => {
-        cell.font      = { bold:true, color:{argb:'FF880E4F'}, size:9 };
-        cell.fill      = { type:'pattern', pattern:'solid', fgColor:{argb:'FFFFF0F6'} };
-        cell.alignment = { horizontal:'left', vertical:'middle' };
-        cell.border    = { bottom:{ style:'thin', color:{argb:'FFFFCCDD'} } };
-      });
-
+      ws.mergeCells(`A${sepRow.number}:${lastCol}${sepRow.number}`); sepRow.height=22;
+      sepRow.getCell(1).font={bold:true,color:{argb:'FFFFFFFF'},size:10}; sepRow.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFAD1457'}}; sepRow.getCell(1).alignment={horizontal:'left',vertical:'middle',indent:1};
+      const hRow = ws.addRow(headers); hRow.height=16;
+      hRow.eachCell(cell => { cell.font={bold:true,color:{argb:'FF880E4F'},size:9}; cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF0F6'}}; cell.alignment={horizontal:'left',vertical:'middle'}; cell.border={bottom:{style:'thin',color:{argb:'FFFFCCDD'}}}; });
       linhas.forEach((row, idx) => {
-        const res     = String(row[iReserva]||'').trim();
-        const tipoDoc = String(row[iDoc]||'').trim();
-        const numDoc  = String(row[iNumDoc]||'').trim();
-        const docComb = tipoDoc && numDoc && tipoDoc!==numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
-        const emailV  = temEmail ? String(row[iEmail]||'').trim() : null;
-        const valores = temEmail
-          ? [row[iNome]||'', res, row[iTrecho]||'', emailV||'', docComb]
-          : [row[iNome]||'', res, row[iTrecho]||'', docComb];
-
-        const dataRow = ws.addRow(valores);
-        dataRow.height = 15;
-
-        const grupoId = reservaParaGrupo[res];
-        const ci      = corDoGrupo[grupoId];
-
+        const res=String(row[iReserva]||'').trim(), tipoDoc=String(row[iDoc]||'').trim(), numDoc=String(row[iNumDoc]||'').trim();
+        const docComb=tipoDoc&&numDoc&&tipoDoc!==numDoc?`${tipoDoc} · ${numDoc}`:(numDoc||tipoDoc||'');
+        const emailV=temEmail?String(row[iEmail]||'').trim():null;
+        const valores=temEmail?[row[iNome]||'',res,row[iTrecho]||'',emailV||'',docComb]:[row[iNome]||'',res,row[iTrecho]||'',docComb];
+        const dataRow=ws.addRow(valores); dataRow.height=15;
+        const ci=corDoGrupo[reservaParaGrupo[res]];
         dataRow.eachCell(cell => {
-          if(ci !== undefined) {
-            cell.fill = { type:'pattern', pattern:'solid', fgColor:{ argb: toArgb(PALETTE[ci]) } };
-            cell.font = { bold:true, color:{ argb: toArgb(PALETTE_TEXT[ci]) }, size:9 };
-          } else {
-            cell.fill = { type:'pattern', pattern:'solid', fgColor:{ argb: idx%2===0?'FFFFFFFF':'FFFAFAFA' } };
-            cell.font = { size:9, color:{ argb:'FF333333' } };
-          }
-          cell.alignment = { vertical:'middle' };
-          cell.border    = { bottom:{ style:'thin', color:{argb:'FFF0F0F0'} } };
+          if(ci!==undefined){cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:toArgb(PALETTE[ci])}};cell.font={bold:true,color:{argb:toArgb(PALETTE_TEXT[ci])},size:9};}
+          else{cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:idx%2===0?'FFFFFFFF':'FFFAFAFA'}};cell.font={size:9,color:{argb:'FF333333'}};}
+          cell.alignment={vertical:'middle'}; cell.border={bottom:{style:'thin',color:{argb:'FFF0F0F0'}}};
         });
       });
-
-      if(tIdx < ordemTrecho.length - 1) ws.addRow([]);
+      if(tIdx < ordemTrecho.length-1) ws.addRow([]);
     });
-
-    ws.views = [{ state:'frozen', ySplit:1 }];
-
-    const buffer = await wb.xlsx.writeBuffer();
-    const blob   = new Blob([buffer], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-    const a = document.createElement('a');
-    const d = new Date().toISOString().slice(0,10);
-    a.download = `reservas_${d}.xlsx`;
-    a.href = URL.createObjectURL(blob);
-    a.click();
-
-    btn.disabled = false; btn.textContent = 'Exportar Excel';
-    mostrarToast(`reservas_${d}.xlsx salvo!`, false);
-  } catch(err) {
-    btn.disabled = false; btn.textContent = 'Exportar Excel';
-    mostrarToast('Erro: ' + err.message, true);
-    console.error(err);
-  }
+    ws.views=[{state:'frozen',ySplit:1}];
+    const buffer=await wb.xlsx.writeBuffer();
+    const a=document.createElement('a'), d=new Date().toISOString().slice(0,10);
+    a.download=`reservas_${d}.xlsx`; a.href=URL.createObjectURL(new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})); a.click();
+    btn.disabled=false; btn.textContent='Exportar Excel'; mostrarToast(`reservas_${d}.xlsx salvo!`,false);
+  } catch(err) { btn.disabled=false; btn.textContent='Exportar Excel'; mostrarToast('Erro: '+err.message,true); console.error(err); }
 }
-
+ 
 // ===== JUNTAR PASSAGENS =====
 let mergeFiles = [], dragSrcIndex = null;
-
 const mergeInput = document.getElementById('merge-input');
 const mergeDropZone = document.getElementById('merge-drop');
-
 mergeDropZone.addEventListener('dragover', e => { e.preventDefault(); mergeDropZone.classList.add('drag'); });
 mergeDropZone.addEventListener('dragleave', () => mergeDropZone.classList.remove('drag'));
 mergeDropZone.addEventListener('drop', e => { e.preventDefault(); mergeDropZone.classList.remove('drag'); adicionarArquivos(Array.from(e.dataTransfer.files)); });
 mergeInput.addEventListener('change', e => { adicionarArquivos(Array.from(e.target.files)); e.target.value=''; });
-
+ 
 function adicionarArquivos(files) {
   const validos = files.filter(f => /\.(pdf|jpe?g|png)$/i.test(f.name));
   validos.forEach(f => { if(!mergeFiles.find(x => x.name===f.name && x.size===f.size)) mergeFiles.push(f); });
   renderizarLista();
 }
-
+ 
 function renderizarLista() {
   const card = document.getElementById('merge-card');
   if(mergeFiles.length === 0) { card.classList.add('hidden'); return; }
   card.classList.remove('hidden');
   document.getElementById('merge-count-label').textContent = `${mergeFiles.length} arquivo(s) · arraste para reordenar`;
-  const list = document.getElementById('merge-file-list');
-  list.innerHTML = mergeFiles.map((f,i) => {
+  document.getElementById('merge-file-list').innerHTML = mergeFiles.map((f,i) => {
     const isPDF = /\.pdf$/i.test(f.name);
     const size = f.size > 1024*1024 ? (f.size/1024/1024).toFixed(1)+'MB' : Math.round(f.size/1024)+'KB';
-    return `<div class="file-item" draggable="true" data-index="${i}"
-      ondragstart="dragStart(event,${i})" ondragover="dragOver(event,${i})"
-      ondrop="dropItem(event,${i})" ondragend="dragEnd(event)">
+    return `<div class="file-item" draggable="true" data-index="${i}" ondragstart="dragStart(event,${i})" ondragover="dragOver(event,${i})" ondrop="dropItem(event,${i})" ondragend="dragEnd(event)">
       <span class="drag-handle">⠿</span>
       <div class="file-icon ${isPDF?'pdf':'img'}">${isPDF?'PDF':'IMG'}</div>
       <span class="file-name">${f.name}</span>
@@ -1613,81 +961,58 @@ function renderizarLista() {
     </div>`;
   }).join('');
 }
-
+ 
 function removerArquivo(i) { mergeFiles.splice(i,1); renderizarLista(); }
 function limparMerge() { mergeFiles=[]; renderizarLista(); document.getElementById('progress-wrap').style.display='none'; }
 function dragStart(e,i) { dragSrcIndex=i; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
 function dragOver(e,i) { e.preventDefault(); document.querySelectorAll('.file-item').forEach(el=>el.classList.remove('drag-over')); if(i!==dragSrcIndex) e.currentTarget.classList.add('drag-over'); }
 function dropItem(e,i) { e.preventDefault(); if(dragSrcIndex===null||dragSrcIndex===i) return; const m=mergeFiles.splice(dragSrcIndex,1)[0]; mergeFiles.splice(i,0,m); dragSrcIndex=null; renderizarLista(); }
 function dragEnd(e) { e.target.classList.remove('dragging'); document.querySelectorAll('.file-item').forEach(el=>el.classList.remove('drag-over')); }
-
+ 
 async function juntarPDFs() {
   if(!mergeFiles.length) return;
-  const btn = document.getElementById('btn-merge');
-  const pw = document.getElementById('progress-wrap');
-  const pb = document.getElementById('progress-bar');
-  const st = document.getElementById('merge-status');
-  btn.disabled=true; btn.textContent='Processando...';
-  pw.style.display='block'; pb.style.width='0%';
+  const btn=document.getElementById('btn-merge'), pw=document.getElementById('progress-wrap'), pb=document.getElementById('progress-bar'), st=document.getElementById('merge-status');
+  btn.disabled=true; btn.textContent='Processando...'; pw.style.display='block'; pb.style.width='0%';
   try {
     const { PDFDocument } = PDFLib;
     const finalPdf = await PDFDocument.create();
     for(let i=0; i<mergeFiles.length; i++) {
-      const file = mergeFiles[i];
-      const buf = await file.arrayBuffer();
-      pb.style.width = Math.round((i/mergeFiles.length)*85)+'%';
-      st.textContent = `Processando ${i+1}/${mergeFiles.length}...`;
+      const file=mergeFiles[i], buf=await file.arrayBuffer();
+      pb.style.width=Math.round((i/mergeFiles.length)*85)+'%'; st.textContent=`Processando ${i+1}/${mergeFiles.length}...`;
       if(/\.pdf$/i.test(file.name)) {
-        const src = await PDFDocument.load(buf, {ignoreEncryption:true});
-        const pages = await finalPdf.copyPages(src, src.getPageIndices());
-        pages.forEach(p => finalPdf.addPage(p));
+        const src=await PDFDocument.load(buf,{ignoreEncryption:true});
+        const pages=await finalPdf.copyPages(src,src.getPageIndices());
+        pages.forEach(p=>finalPdf.addPage(p));
       } else {
-        const isJpeg = /\.jpe?g$/i.test(file.name);
-        const img = isJpeg ? await finalPdf.embedJpg(buf) : await finalPdf.embedPng(buf);
-        const page = finalPdf.addPage([img.width, img.height]);
-        page.drawImage(img, {x:0, y:0, width:img.width, height:img.height});
+        const isJpeg=/\.jpe?g$/i.test(file.name);
+        const img=isJpeg?await finalPdf.embedJpg(buf):await finalPdf.embedPng(buf);
+        const page=finalPdf.addPage([img.width,img.height]);
+        page.drawImage(img,{x:0,y:0,width:img.width,height:img.height});
       }
     }
     pb.style.width='95%'; st.textContent='Finalizando...';
-    const pdfBytes = await finalPdf.save();
-    const d = new Date().toISOString().slice(0,10);
-    const a = document.createElement('a');
-    a.download = `passagens_${d}.pdf`;
-    a.href = URL.createObjectURL(new Blob([pdfBytes], {type:'application/pdf'}));
-    a.click();
-    pb.style.width='100%';
-    btn.disabled=false; btn.textContent='Gerar PDF unificado';
+    const pdfBytes=await finalPdf.save(), d=new Date().toISOString().slice(0,10);
+    const a=document.createElement('a');
+    a.download=`passagens_${d}.pdf`; a.href=URL.createObjectURL(new Blob([pdfBytes],{type:'application/pdf'})); a.click();
+    pb.style.width='100%'; btn.disabled=false; btn.textContent='Gerar PDF unificado';
     st.textContent=`✓ PDF gerado com ${mergeFiles.length} arquivo(s)!`;
-    mostrarToast(`passagens_${d}.pdf salvo!`, false);
+    mostrarToast(`passagens_${d}.pdf salvo!`,false);
     setTimeout(()=>{ pw.style.display='none'; pb.style.width='0%'; },3000);
-  } catch(err) {
-    btn.disabled=false; btn.textContent='Gerar PDF unificado';
-    st.textContent='Erro: '+err.message;
-    mostrarToast('Erro ao juntar arquivos.', true);
-    pw.style.display='none';
-  }
+  } catch(err) { btn.disabled=false; btn.textContent='Gerar PDF unificado'; st.textContent='Erro: '+err.message; mostrarToast('Erro ao juntar arquivos.',true); pw.style.display='none'; }
 }
-
+ 
 // ===== TOAST =====
 function mostrarToast(msg, erro) {
   const t = document.getElementById('toast');
   document.getElementById('toast-text').textContent = msg;
   t.className = 'toast' + (erro?' error':'');
-  t.style.display='flex';
-  setTimeout(()=>t.style.display='none', 4000);
+  t.style.display = 'flex';
+  setTimeout(() => t.style.display='none', 4000);
 }
-
-// Fecha dropdown ao clicar fora
+ 
 document.addEventListener('click', e => {
   if(!e.target.closest('.ac-wrap')) {
-    document.querySelectorAll('.ac-dropdown').forEach(d => { d.classList.remove('open'); d.innerHTML = ''; });
-  }
-});
-
-// Marca campo de endereço como editado manualmente
-document.addEventListener('input', e => {
-  if(e.target.id && e.target.id.includes('endereco')) {
-    e.target.dataset.editado = '1';
+    document.querySelectorAll('.ac-dropdown').forEach(d => { d.classList.remove('open'); d.innerHTML=''; });
   }
 });
 </script>
