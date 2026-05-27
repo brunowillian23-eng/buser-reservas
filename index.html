@@ -854,24 +854,7 @@ function acSelect(inputId, idx) {
   document.getElementById(inputId).value = item.label;
   document.getElementById('ac-' + inputId).classList.remove('open');
 
-  if(inputId.startsWith('jira-destino')) {
-    const sufixo = inputId.replace('jira-destino', '');
-    const endId  = sufixo === '' ? 'jira-endereco' : `jira-endereco${sufixo}`;
-    const hintId = sufixo === '' ? 'hint-endereco-main' : `hint-endereco${sufixo}`;
-    const endEl  = document.getElementById(endId);
-    const hintEl = document.getElementById(hintId);
-    const rod    = DB_RODOVIARIAS[item.label];
-    if(endEl) {
-      if(rod) {
-        endEl.value = rod.end;
-        endEl.style.background = '#f0fff4';
-        setTimeout(() => endEl.style.background = '', 1500);
-        if(hintEl) { hintEl.textContent = '✓ Endereço preenchido automaticamente'; hintEl.style.display = 'block'; }
-      } else if(endEl.value === '') {
-        if(hintEl) { hintEl.textContent = 'Rodoviária não encontrada — preencha o endereço manualmente.'; hintEl.style.display = 'block'; }
-      }
-    }
-  }
+
 
   if(inputId.startsWith('jira-empresa')) {
     const sufixo = inputId.replace('jira-empresa', '');
@@ -950,10 +933,10 @@ function gerarTextoJira() {
 
 function montarBloco(trecho, horario, empresa, endereco) {
   const h = formatarHorario(horario);
-  return `${trecho}
-Por gentileza, comunicar os paxs que o embarque será na rodoviária às ${h}.
-Retirar as passagens no guichê da Viação ${empresa} com 1h de antecedência, com documentos em mãos.
-Endereço da rodoviária: ${endereco}`;
+  return `Por favor, informem aos passageiros do trecho: ${trecho}
+Que compramos passagem rodoviária para o seguimento da viagem (ou realização da viagem). A viagem será às ${h}.
+Solicitar que retirem as passagens no guichê da Viação ${empresa} com 1h de antecedência, portando documento em mãos.
+Endereço da rodoviária: ${endereco}.`;
 }
 
 function adicionarTrecho() {
