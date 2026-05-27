@@ -1013,12 +1013,35 @@ function removerTrecho(idx) {
 
 function copiarTextoJira() {
   const texto = document.getElementById('jira-preview').textContent;
-  navigator.clipboard.writeText(texto).then(() => {
-    const btn = document.getElementById('btn-copiar-jira');
+  const btn = document.getElementById('btn-copiar-jira');
+
+  const confirmar = () => {
     btn.textContent = '✓ Copiado!';
     setTimeout(() => { btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copiar texto'; }, 2000);
     mostrarToast('Texto copiado para a área de transferência!', false);
-  });
+  };
+
+  if(navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(texto).then(confirmar).catch(() => copiarFallback(texto, confirmar));
+  } else {
+    copiarFallback(texto, confirmar);
+  }
+}
+
+function copiarFallback(texto, callback) {
+  const ta = document.createElement('textarea');
+  ta.value = texto;
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+    if(callback) callback();
+  } catch(e) {
+    mostrarToast('Não foi possível copiar. Selecione o texto manualmente.', true);
+  }
+  document.body.removeChild(ta);
 }
 
 function limparJira() {
