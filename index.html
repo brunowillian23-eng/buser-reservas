@@ -308,8 +308,42 @@
 
   .hidden { display: none !important; }
 
-  /* SECTION TABS */
-  .tab-panels { }
+  /* AUTOCOMPLETE */
+  .ac-wrap { position: relative; flex: 1; }
+  .ac-wrap input { width: 100%; }
+  .ac-dropdown {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+    background: #fff; border: 1px solid var(--gray-border);
+    border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    z-index: 200; max-height: 220px; overflow-y: auto; display: none;
+  }
+  .ac-dropdown.open { display: block; }
+  .ac-item {
+    padding: 9px 14px; font-size: 13px; cursor: pointer;
+    border-bottom: 1px solid #f5f5f5; display: flex; flex-direction: column; gap: 2px;
+  }
+  .ac-item:last-child { border-bottom: none; }
+  .ac-item:hover, .ac-item.selected { background: var(--pink-bg); }
+  .ac-item .ac-main { font-weight: 500; color: var(--dark); }
+  .ac-item .ac-sub { font-size: 11px; color: var(--gray-text); }
+  .ac-item .ac-mark { color: var(--pink); font-weight: 700; }
+
+  .hint-tag {
+    display: inline-block; background: var(--pink-bg); color: var(--pink);
+    font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
+    margin-top: 6px; cursor: pointer; border: 1px solid var(--pink-light);
+  }
+  .hint-tag:hover { background: #FCE4EC; }
+
+  .field-wrap { display: flex; flex-direction: column; }
+
+  .hint-empresas { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+
+  .hint-endereco {
+    margin-top: 6px; padding: 8px 12px; background: var(--pink-bg);
+    border: 1px solid var(--pink-light); border-radius: 8px;
+    font-size: 12px; color: var(--pink-dark); display: none;
+  }
 </style>
 </head>
 <body>
@@ -343,6 +377,9 @@
       </button>
       <button class="hero-tab" onclick="switchTab('passagens', this)">
         📄 Juntar Passagens
+      </button>
+      <button class="hero-tab" onclick="switchTab('jira', this)">
+        📋 Gerar Texto Jira
       </button>
     </div>
   </div>
@@ -492,6 +529,115 @@
 
   </div><!-- /tab-passagens -->
 
+  <!-- ===== SEÇÃO 3: GERADOR JIRA ===== -->
+  <div id="tab-jira" class="section">
+
+    <div class="card">
+      <div class="card-title">
+        <div class="icon">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+        </div>
+        <div>
+          <h2>Gerador de texto para Jira</h2>
+          <p>Preencha os campos e copie o texto pronto para colar no chamado</p>
+        </div>
+      </div>
+
+      <!-- FORMULÁRIO -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+
+        <div style="grid-column:1/-1;">
+          <label style="font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">Trecho</label>
+          <div style="display:flex;align-items:flex-start;gap:10px;">
+            <div class="ac-wrap field-wrap">
+              <input id="jira-origem" type="text" placeholder="Cidade de origem (ex: Belo Horizonte-MG)"
+                oninput="acInput(this,'cidade','jira-origem')" onkeydown="acKey(event,'jira-origem')"
+                autocomplete="off"
+                style="padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
+              <div class="ac-dropdown" id="ac-jira-origem"></div>
+            </div>
+            <span style="color:var(--pink);font-weight:700;font-size:22px;flex-shrink:0;margin-top:7px;">→</span>
+            <div class="ac-wrap field-wrap">
+              <input id="jira-destino" type="text" placeholder="Cidade de destino (ex: Rio de Janeiro-RJ)"
+                oninput="acInput(this,'cidade','jira-destino')" onkeydown="acKey(event,'jira-destino')"
+                autocomplete="off"
+                style="padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
+              <div class="ac-dropdown" id="ac-jira-destino"></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">Horário de embarque</label>
+          <input id="jira-horario" type="time" oninput="gerarTextoJira()"
+            style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
+        </div>
+
+        <div class="field-wrap">
+          <label style="font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">Empresa (viação)</label>
+          <div class="ac-wrap">
+            <input id="jira-empresa" type="text" placeholder="ex: Cometa, Util, Gontijo..."
+              oninput="acInput(this,'empresa','jira-empresa')" onkeydown="acKey(event,'jira-empresa')"
+              autocomplete="off"
+              style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
+            <div class="ac-dropdown" id="ac-jira-empresa"></div>
+          </div>
+          <div class="hint-empresas" id="hint-empresas-main"></div>
+        </div>
+
+        <div class="field-wrap" style="grid-column:1/-1;">
+          <label style="font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">Endereço da rodoviária</label>
+          <div class="ac-wrap">
+            <input id="jira-endereco" type="text" placeholder="Preenchido automaticamente ou digite manualmente"
+              oninput="gerarTextoJira()"
+              autocomplete="off"
+              style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;background:#fafafa;">
+          </div>
+          <div class="hint-endereco" id="hint-endereco-main"></div>
+        </div>
+
+      </div>
+
+      <!-- BOTÃO ADICIONAR TRECHO -->
+      <button class="btn btn-outline" onclick="adicionarTrecho()" style="margin-bottom:20px;">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Adicionar outro trecho
+      </button>
+
+      <!-- TRECHOS EXTRAS -->
+      <div id="jira-trechos-extras"></div>
+
+    </div>
+
+    <!-- PREVIEW DO TEXTO -->
+    <div class="card" id="jira-preview-card" style="display:none;">
+      <div class="card-title">
+        <div class="icon">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        </div>
+        <div>
+          <h2>Texto gerado</h2>
+          <p>Revise e copie para o chamado no Jira</p>
+        </div>
+      </div>
+
+      <div id="jira-preview"
+        style="background:var(--gray-bg);border:1px solid var(--gray-border);border-radius:10px;padding:18px 20px;font-size:14px;line-height:1.8;color:var(--dark);white-space:pre-wrap;font-family:inherit;min-height:80px;"></div>
+
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
+        <button class="btn btn-pink" onclick="copiarTextoJira()" id="btn-copiar-jira">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copiar texto
+        </button>
+        <button class="btn btn-outline" onclick="limparJira()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+          Limpar
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /tab-jira -->
+
 </div><!-- /container -->
 
 <div class="toast" id="toast">
@@ -505,6 +651,402 @@ function switchTab(tab, el) {
   document.getElementById('tab-' + tab).classList.add('active');
   document.querySelectorAll('.hero-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
+}
+
+// ===== BANCO DE DADOS: CIDADES, EMPRESAS E RODOVIÁRIAS =====
+const DB_CIDADES = [
+  { nome: 'São Paulo-SP',        uf: 'SP' },
+  { nome: 'Rio de Janeiro-RJ',   uf: 'RJ' },
+  { nome: 'Belo Horizonte-MG',   uf: 'MG' },
+  { nome: 'Campinas-SP',         uf: 'SP' },
+  { nome: 'Curitiba-PR',         uf: 'PR' },
+  { nome: 'Porto Alegre-RS',     uf: 'RS' },
+  { nome: 'Salvador-BA',         uf: 'BA' },
+  { nome: 'Recife-PE',           uf: 'PE' },
+  { nome: 'Fortaleza-CE',        uf: 'CE' },
+  { nome: 'Manaus-AM',           uf: 'AM' },
+  { nome: 'Brasília-DF',         uf: 'DF' },
+  { nome: 'Goiânia-GO',          uf: 'GO' },
+  { nome: 'Florianópolis-SC',    uf: 'SC' },
+  { nome: 'Vitória-ES',          uf: 'ES' },
+  { nome: 'Maceió-AL',           uf: 'AL' },
+  { nome: 'Natal-RN',            uf: 'RN' },
+  { nome: 'Teresina-PI',         uf: 'PI' },
+  { nome: 'Campo Grande-MS',     uf: 'MS' },
+  { nome: 'Cuiabá-MT',           uf: 'MT' },
+  { nome: 'Belém-PA',            uf: 'PA' },
+  { nome: 'Macapá-AP',           uf: 'AP' },
+  { nome: 'Porto Velho-RO',      uf: 'RO' },
+  { nome: 'Rio Branco-AC',       uf: 'AC' },
+  { nome: 'Boa Vista-RR',        uf: 'RR' },
+  { nome: 'Palmas-TO',           uf: 'TO' },
+  { nome: 'São Luís-MA',         uf: 'MA' },
+  { nome: 'João Pessoa-PB',      uf: 'PB' },
+  { nome: 'Aracaju-SE',          uf: 'SE' },
+  { nome: 'Uberlândia-MG',       uf: 'MG' },
+  { nome: 'Ribeirão Preto-SP',   uf: 'SP' },
+  { nome: 'Santos-SP',           uf: 'SP' },
+  { nome: 'São José dos Campos-SP', uf: 'SP' },
+  { nome: 'Sorocaba-SP',         uf: 'SP' },
+  { nome: 'Londrina-PR',         uf: 'PR' },
+  { nome: 'Maringá-PR',          uf: 'PR' },
+  { nome: 'Joinville-SC',        uf: 'SC' },
+  { nome: 'Blumenau-SC',         uf: 'SC' },
+  { nome: 'Juiz de Fora-MG',     uf: 'MG' },
+  { nome: 'Contagem-MG',         uf: 'MG' },
+  { nome: 'Montes Claros-MG',    uf: 'MG' },
+  { nome: 'Diamantina-MG',       uf: 'MG' },
+  { nome: 'Governador Valadares-MG', uf: 'MG' },
+  { nome: 'Ipatinga-MG',         uf: 'MG' },
+  { nome: 'Sete Lagoas-MG',      uf: 'MG' },
+  { nome: 'Divinópolis-MG',      uf: 'MG' },
+  { nome: 'Poços de Caldas-MG',  uf: 'MG' },
+  { nome: 'Barbacena-MG',        uf: 'MG' },
+  { nome: 'Patos de Minas-MG',   uf: 'MG' },
+  { nome: 'Teófilo Otoni-MG',    uf: 'MG' },
+  { nome: 'Uberaba-MG',          uf: 'MG' },
+  { nome: 'Curvelo-MG',          uf: 'MG' },
+  { nome: 'Conselheiro Lafaiete-MG', uf: 'MG' },
+  { nome: 'Caratinga-MG',        uf: 'MG' },
+  { nome: 'Araxá-MG',            uf: 'MG' },
+  { nome: 'Passos-MG',           uf: 'MG' },
+  { nome: 'Itabira-MG',          uf: 'MG' },
+  { nome: 'Feira de Santana-BA', uf: 'BA' },
+  { nome: 'Caruaru-PE',          uf: 'PE' },
+  { nome: 'Campina Grande-PB',   uf: 'PB' },
+  { nome: 'Mossoró-RN',          uf: 'RN' },
+  { nome: 'Imperatriz-MA',       uf: 'MA' },
+  { nome: 'Caraguatatuba-SP',    uf: 'SP' },
+  { nome: 'Guarulhos-SP',        uf: 'SP' },
+  { nome: 'Osasco-SP',           uf: 'SP' },
+  { nome: 'Santo André-SP',      uf: 'SP' },
+  { nome: 'São Bernardo do Campo-SP', uf: 'SP' },
+  { nome: 'Bauru-SP',            uf: 'SP' },
+  { nome: 'Piracicaba-SP',       uf: 'SP' },
+  { nome: 'São José do Rio Preto-SP', uf: 'SP' },
+  { nome: 'Arapiraca-AL',        uf: 'AL' },
+  { nome: 'Novo Lino-AL',        uf: 'AL' },
+  { nome: 'Palmeira dos Índios-AL', uf: 'AL' },
+];
+
+const DB_EMPRESAS = [
+  'Gontijo', 'Cometa', 'Util', 'Kaissara', 'Águia Branca',
+  'Itapemirim', 'Pássaro Marron', 'Nacional Expresso', 'Expresso do Sul',
+  'Penha', 'Planalto', 'JBL', 'Real Expresso', 'Viação Garcia',
+  'Auto Viação Catarinense', 'Eucatur', 'Expresso Brasileiro',
+  'Santo Anjo', 'Univar', 'Rápido Ribeirense', 'São Luís',
+  'Transbrasiliana', 'Expresso Nordeste', 'Progresso',
+  'Viação Motta', 'Expresso Guanabara', 'Viação Ouro e Prata',
+  'Buser', 'Lirabus', 'Viação Riodoce',
+];
+
+const DB_RODOVIARIAS = {
+  'São Paulo-SP':        { end: 'Praça Júlio Prestes, s/n - Luz, São Paulo - SP, 01218-020' },
+  'Rio de Janeiro-RJ':   { end: 'Av. Francisco Bicalho, 1 - Santo Cristo, Rio de Janeiro - RJ, 20220-310' },
+  'Belo Horizonte-MG':   { end: 'Praça Rio Branco, 100 - Centro, Belo Horizonte - MG, 30110-002' },
+  'Campinas-SP':         { end: 'R. Dr. Campos Sales, 101 - Centro, Campinas - SP, 13010-040' },
+  'Curitiba-PR':         { end: 'Av. Afonso Camargo, 330 - Jardim Botânico, Curitiba - PR, 80060-090' },
+  'Porto Alegre-RS':     { end: 'Largo Vespasiano Julio Veppo, 10 - Floresta, Porto Alegre - RS, 90220-270' },
+  'Salvador-BA':         { end: 'Av. Antônio Carlos Magalhães, s/n - Iguatemi, Salvador - BA, 41825-000' },
+  'Recife-PE':           { end: 'Praça Gal. Cordeiro de Farias, s/n - Boa Vista, Recife - PE, 50070-280' },
+  'Fortaleza-CE':        { end: 'Av. Borges de Melo, 1630 - Fátima, Fortaleza - CE, 60415-640' },
+  'Brasília-DF':         { end: 'ST de Clubes Esportivos Sul Trecho 2, Conjunto 22 - Asa Sul, Brasília - DF, 70322-915' },
+  'Goiânia-GO':          { end: 'R. 44, 399 - Vila Nova, Goiânia - GO, 74645-080' },
+  'Florianópolis-SC':    { end: 'R. Antônio Edu Vieira, 1490 - Pantanal, Florianópolis - SC, 88040-001' },
+  'Vitória-ES':          { end: 'Av. Jerônimo Monteiro, 101 - Centro, Vitória - ES, 29010-002' },
+  'Uberlândia-MG':       { end: 'Av. João Naves de Ávila, 657 - Brasil, Uberlândia - MG, 38400-398' },
+  'Ribeirão Preto-SP':   { end: 'R. Dr. Celso Charuri, 90 - Vila Tibério, Ribeirão Preto - SP, 14050-060' },
+  'Londrina-PR':         { end: 'Av. Dom Pedro II, 98 - Centro, Londrina - PR, 86010-150' },
+  'Joinville-SC':        { end: 'R. Paraíba, 260 - Anita Garibaldi, Joinville - SC, 89203-015' },
+  'Juiz de Fora-MG':     { end: 'Av. Brasil, 4001 - Barreira do Triunfo, Juiz de Fora - MG, 36092-020' },
+  'Montes Claros-MG':    { end: 'Av. Dr. Carlos Versiani Gomes, 699 - Augusta Mota, Montes Claros - MG, 39401-115' },
+  'Diamantina-MG':       { end: 'Av. Silvio Felício dos Santos, s/n - Mercês, Diamantina - MG, 39100-000' },
+  'Sete Lagoas-MG':      { end: 'Av. Prefeito Alberto Moura, 7001 - Eldorado, Sete Lagoas - MG, 35700-388' },
+  'Santos-SP':           { end: 'Praça dos Andradas, s/n - Centro, Santos - SP, 11010-905' },
+  'Maceió-AL':           { end: 'R. Dr. Aristides Maltez, s/n - Fernão Velho, Maceió - AL, 57030-020' },
+  'Natal-RN':            { end: 'Av. Capitão Mor Gouveia, 1237 - Cidade da Esperança, Natal - RN, 59071-010' },
+  'Feira de Santana-BA': { end: 'R. Senhor dos Passos, s/n - Centro, Feira de Santana - BA, 44001-090' },
+  'Caruaru-PE':          { end: 'Av. José Rufino, s/n - Indianópolis, Caruaru - PE, 55014-260' },
+  'Caraguatatuba-SP':    { end: 'R. São João, 120 - Poiares, Caraguatatuba - SP, 11660-300' },
+  'Guarulhos-SP':        { end: 'Av. Brigadeiro Faria Lima, 3565 - Jardim Munhoz, Guarulhos - SP, 07016-100' },
+  'Bauru-SP':            { end: 'Praça Dr. Sidélio Munia, 1 - Centro, Bauru - SP, 17010-230' },
+  'Barbacena-MG':        { end: 'Av. Bias Fortes, 100 - Floresta, Barbacena - MG, 36202-020' },
+  'Governador Valadares-MG': { end: 'Av. Minas Gerais, 51 - Centro, Gov. Valadares - MG, 35010-170' },
+  'Conselheiro Lafaiete-MG': { end: 'Rua Rodovias Federais, s/n - São Caetano, Conselheiro Lafaiete - MG, 36400-000' },
+  'Curvelo-MG':          { end: 'Av. Getúlio Vargas, 800 - Centro, Curvelo - MG, 35790-000' },
+  'Campo Grande-MS':     { end: 'R. Joaquim Nabuco, 200 - Monte Castelo, Campo Grande - MS, 79010-100' },
+  'Belém-PA':            { end: 'Av. Almirante Barroso, 3565 - Marco, Belém - PA, 66093-020' },
+  'Manaus-AM':           { end: 'R. Recife, s/n - Flores, Manaus - AM, 69058-030' },
+  'Campina Grande-PB':   { end: 'Av. Sen. Argemiro de Figueiredo, s/n - Itararé, Campina Grande - PB, 58411-020' },
+};
+
+// ===== AUTOCOMPLETE ENGINE =====
+let acState = {};
+
+function acInput(input, tipo, inputId) {
+  const q = input.value.trim().toLowerCase();
+  const drop = document.getElementById('ac-' + inputId);
+  gerarTextoJira();
+
+  if(q.length < 1) { drop.classList.remove('open'); return; }
+
+  let items = [];
+  if(tipo === 'cidade') {
+    items = DB_CIDADES
+      .filter(c => c.nome.toLowerCase().includes(q))
+      .slice(0, 8)
+      .map(c => ({ label: c.nome, sub: null }));
+  } else if(tipo === 'empresa') {
+    items = DB_EMPRESAS
+      .filter(e => e.toLowerCase().includes(q))
+      .slice(0, 8)
+      .map(e => ({ label: e, sub: null }));
+    renderHintEmpresas(inputId);
+  }
+
+  if(items.length === 0) { drop.classList.remove('open'); return; }
+
+  acState[inputId] = { items, selected: -1 };
+  drop.innerHTML = items.map((item, i) => {
+    const mark = item.label.replace(new RegExp(`(${q})`, 'gi'), '<span class="ac-mark">$1</span>');
+    return `<div class="ac-item" data-i="${i}" onmousedown="acSelect('${inputId}', ${i})">
+      <span class="ac-main">${mark}</span>
+      ${item.sub ? `<span class="ac-sub">${item.sub}</span>` : ''}
+    </div>`;
+  }).join('');
+  drop.classList.add('open');
+
+  document.onclick = (e) => {
+    if(!drop.contains(e.target) && e.target !== input) drop.classList.remove('open');
+  };
+}
+
+function acKey(e, inputId) {
+  const drop = document.getElementById('ac-' + inputId);
+  const state = acState[inputId];
+  if(!state || !drop.classList.contains('open')) return;
+  if(e.key === 'ArrowDown') {
+    e.preventDefault();
+    state.selected = Math.min(state.selected + 1, state.items.length - 1);
+    acHighlight(drop, state.selected);
+  } else if(e.key === 'ArrowUp') {
+    e.preventDefault();
+    state.selected = Math.max(state.selected - 1, 0);
+    acHighlight(drop, state.selected);
+  } else if(e.key === 'Enter' && state.selected >= 0) {
+    e.preventDefault();
+    acSelect(inputId, state.selected);
+  } else if(e.key === 'Escape') {
+    drop.classList.remove('open');
+  }
+}
+
+function acHighlight(drop, idx) {
+  drop.querySelectorAll('.ac-item').forEach((el, i) => {
+    el.classList.toggle('selected', i === idx);
+  });
+}
+
+function acSelect(inputId, idx) {
+  const state = acState[inputId];
+  if(!state) return;
+  const item = state.items[idx];
+  document.getElementById(inputId).value = item.label;
+  document.getElementById('ac-' + inputId).classList.remove('open');
+
+  if(inputId.startsWith('jira-destino')) {
+    const sufixo = inputId.replace('jira-destino', '');
+    const endId  = sufixo === '' ? 'jira-endereco' : `jira-endereco${sufixo}`;
+    const hintId = sufixo === '' ? 'hint-endereco-main' : `hint-endereco${sufixo}`;
+    const endEl  = document.getElementById(endId);
+    const hintEl = document.getElementById(hintId);
+    const rod    = DB_RODOVIARIAS[item.label];
+    if(endEl) {
+      if(rod) {
+        endEl.value = rod.end;
+        endEl.style.background = '#f0fff4';
+        setTimeout(() => endEl.style.background = '', 1500);
+        if(hintEl) { hintEl.textContent = '✓ Endereço preenchido automaticamente'; hintEl.style.display = 'block'; }
+      } else if(endEl.value === '') {
+        if(hintEl) { hintEl.textContent = 'Rodoviária não encontrada — preencha o endereço manualmente.'; hintEl.style.display = 'block'; }
+      }
+    }
+  }
+
+  if(inputId.startsWith('jira-empresa')) {
+    const sufixo = inputId.replace('jira-empresa', '');
+    const hintId = sufixo === '' ? 'hint-empresas-main' : `hint-empresas${sufixo}`;
+    renderHintEmpresas(inputId, hintId);
+  }
+
+  gerarTextoJira();
+}
+
+function renderHintEmpresas(inputId, hintId) {
+  hintId = hintId || (inputId === 'jira-empresa' ? 'hint-empresas-main' : 'hint-empresas-' + inputId.replace('jira-empresa-',''));
+  const el = document.getElementById(hintId);
+  if(!el || el.children.length > 0) return;
+  ['Gontijo','Cometa','Util','Kaissara','Águia Branca','Itapemirim'].forEach(emp => {
+    const tag = document.createElement('span');
+    tag.className = 'hint-tag';
+    tag.textContent = emp;
+    tag.onclick = () => { document.getElementById(inputId).value = emp; gerarTextoJira(); };
+    el.appendChild(tag);
+  });
+}
+
+let trechosExtras = [];
+
+function formatarHorario(val) {
+  if(!val) return '(horário)';
+  const [h, m] = val.split(':');
+  return `${h}h${m !== '00' ? m : ''}`;
+}
+
+function gerarTextoJira() {
+  const origem   = document.getElementById('jira-origem').value.trim();
+  const destino  = document.getElementById('jira-destino').value.trim();
+  const horario  = document.getElementById('jira-horario').value;
+  const empresa  = document.getElementById('jira-empresa').value.trim();
+  const endereco = document.getElementById('jira-endereco').value.trim();
+
+  const trecho = origem && destino ? `${origem} → ${destino}` : (origem || destino || '');
+
+  let blocos = [];
+  if(trecho || horario || empresa || endereco) {
+    blocos.push(montarBloco(
+      trecho   || '(trecho)',
+      horario  || '',
+      empresa  || '(empresa)',
+      endereco || '(endereço da rodoviária)'
+    ));
+  }
+
+  trechosExtras.forEach((_, i) => {
+    const o = document.getElementById(`jira-trecho-${i}`)?.value.trim()  || '';
+    const d = document.getElementById(`jira-destino-${i}`)?.value.trim() || '';
+    const h = document.getElementById(`jira-horario-${i}`)?.value        || '';
+    const e = document.getElementById(`jira-empresa-${i}`)?.value.trim() || '';
+    const end = document.getElementById(`jira-endereco-${i}`)?.value.trim() || '';
+    const t = o && d ? `${o} → ${d}` : (o || d || '');
+    if(t || h || e || end) {
+      blocos.push(montarBloco(
+        t   || '(trecho)',
+        h   || '',
+        e   || '(empresa)',
+        end || '(endereço da rodoviária)'
+      ));
+    }
+  });
+
+  if(blocos.length === 0) {
+    document.getElementById('jira-preview-card').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('jira-preview').textContent = blocos.join('\n\n---\n\n');
+  document.getElementById('jira-preview-card').style.display = 'block';
+}
+
+function montarBloco(trecho, horario, empresa, endereco) {
+  const h = formatarHorario(horario);
+  return `${trecho}
+Por gentileza, comunicar os paxs que o embarque será na rodoviária às ${h}.
+Retirar as passagens no guichê da Viação ${empresa} com 1h de antecedência, com documentos em mãos.
+Endereço da rodoviária: ${endereco}`;
+}
+
+function adicionarTrecho() {
+  const idx = trechosExtras.length;
+  trechosExtras.push(idx);
+  const container = document.getElementById('jira-trechos-extras');
+  const div = document.createElement('div');
+  div.id = `trecho-extra-${idx}`;
+  div.style.cssText = 'border-top:1px dashed var(--gray-border);padding-top:16px;margin-bottom:16px;';
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <span style="font-size:12px;font-weight:600;color:var(--pink);text-transform:uppercase;letter-spacing:.4px;">Trecho ${idx + 2}</span>
+      <button onclick="removerTrecho(${idx})" style="background:none;border:none;cursor:pointer;color:#aaa;font-size:18px;line-height:1;" title="Remover">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+      <div style="grid-column:1/-1;">
+        <label style="font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">Trecho</label>
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <div class="ac-wrap">
+            <input id="jira-trecho-${idx}" type="text" placeholder="Cidade de origem"
+              oninput="acInput(this,'cidade','jira-trecho-${idx}')" onkeydown="acKey(event,'jira-trecho-${idx}')"
+              autocomplete="off"
+              style="padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
+            <div class="ac-dropdown" id="ac-jira-trecho-${idx}"></div>
+          </div>
+          <span style="color:var(--pink);font-weight:700;font-size:22px;flex-shrink:0;margin-top:7px;">→</span>
+          <div class="ac-wrap">
+            <input id="jira-destino-${idx}" type="text" placeholder="Cidade de destino"
+              oninput="acInput(this,'cidade','jira-destino-${idx}')" onkeydown="acKey(event,'jira-destino-${idx}')"
+              autocomplete="off"
+              style="padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
+            <div class="ac-dropdown" id="ac-jira-destino-${idx}"></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label style="font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">Horário de embarque</label>
+        <input id="jira-horario-${idx}" type="time" oninput="gerarTextoJira()"
+          style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
+      </div>
+
+      <div class="field-wrap">
+        <label style="font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">Empresa (viação)</label>
+        <div class="ac-wrap">
+          <input id="jira-empresa-${idx}" type="text" placeholder="ex: Cometa, Util, Gontijo..."
+            oninput="acInput(this,'empresa','jira-empresa-${idx}')" onkeydown="acKey(event,'jira-empresa-${idx}')"
+            autocomplete="off"
+            style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;">
+          <div class="ac-dropdown" id="ac-jira-empresa-${idx}"></div>
+        </div>
+        <div class="hint-empresas" id="hint-empresas-${idx}"></div>
+      </div>
+
+      <div class="field-wrap" style="grid-column:1/-1;">
+        <label style="font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">Endereço da rodoviária</label>
+        <input id="jira-endereco-${idx}" type="text" placeholder="Preenchido automaticamente ou digite manualmente"
+          oninput="gerarTextoJira()"
+          autocomplete="off"
+          style="width:100%;padding:9px 12px;border:1px solid var(--gray-border);border-radius:9px;font-size:14px;background:#fafafa;">
+        <div class="hint-endereco" id="hint-endereco-${idx}"></div>
+      </div>
+
+    </div>`;
+  container.appendChild(div);
+}
+
+function removerTrecho(idx) {
+  document.getElementById(`trecho-extra-${idx}`)?.remove();
+  trechosExtras = trechosExtras.filter(i => i !== idx);
+  gerarTextoJira();
+}
+
+function copiarTextoJira() {
+  const texto = document.getElementById('jira-preview').textContent;
+  navigator.clipboard.writeText(texto).then(() => {
+    const btn = document.getElementById('btn-copiar-jira');
+    btn.textContent = '✓ Copiado!';
+    setTimeout(() => { btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copiar texto'; }, 2000);
+    mostrarToast('Texto copiado para a área de transferência!', false);
+  });
+}
+
+function limparJira() {
+  document.getElementById('jira-origem').value   = '';
+  document.getElementById('jira-destino').value  = '';
+  document.getElementById('jira-horario').value  = '';
+  document.getElementById('jira-empresa').value  = '';
+  document.getElementById('jira-endereco').value = '';
+  document.getElementById('jira-trechos-extras').innerHTML = '';
+  trechosExtras = [];
+  document.getElementById('jira-preview-card').style.display = 'none';
 }
 
 // ===== RESERVAS =====
@@ -540,8 +1082,7 @@ function processarArquivo(file) {
     if(json.length < 2) return;
     colunas = json[0].map((c,i) => ({label: String(c||`coluna ${i+1}`), idx: i}));
     dadosTabela = json.slice(1).filter(r => r.some(c => c !== undefined && c !== ''));
-    removidos = []; // limpa removidos ao carregar nova planilha
-    document.getElementById('removidos-panel') && (document.getElementById('removidos-panel').style.display = 'none');
+    removidos = [];
     const btnR = document.getElementById('btn-restaurar');
     if(btnR) btnR.style.display = 'none';
     preencherSelects();
@@ -574,7 +1115,6 @@ function preencherSelects() {
   if(colTipo) document.getElementById('col-documento').value = colTipo.idx;
   if(colNum)  document.getElementById('col-numdoc').value = colNum.idx;
 
-  // E-mail: adiciona opção "não usar" + todas as colunas
   const selEmail = document.getElementById('col-email');
   selEmail.innerHTML = '<option value="-1">— não usar —</option>' +
     colunas.map(c => `<option value="${c.idx}">${c.label}</option>`).join('');
@@ -583,7 +1123,6 @@ function preencherSelects() {
 }
 
 function resolverGruposCor(dadosOrdenados, iReserva, iEmail) {
-  // 1) agrupa por reserva
   const reservaParaGrupo = {};
   const emailParaGrupo   = {};
   let grupoCounter = 0;
@@ -593,22 +1132,16 @@ function resolverGruposCor(dadosOrdenados, iReserva, iEmail) {
     const email = iEmail >= 0 ? String(row[iEmail]||'').trim().toLowerCase() : '';
 
     let grupoId = reservaParaGrupo[res];
-
-    // se ainda não tem grupo, verifica se o email já está em algum grupo
     if(grupoId === undefined && email) {
       grupoId = emailParaGrupo[email];
     }
-
-    // cria grupo novo se necessário
     if(grupoId === undefined) {
       grupoId = ++grupoCounter;
     }
-
     reservaParaGrupo[res] = grupoId;
     if(email) emailParaGrupo[email] = grupoId;
   });
 
-  // conta quantas pessoas por grupo
   const contagemGrupo = {};
   dadosOrdenados.forEach(row => {
     const res = String(row[iReserva]||'').trim();
@@ -616,7 +1149,6 @@ function resolverGruposCor(dadosOrdenados, iReserva, iEmail) {
     contagemGrupo[g] = (contagemGrupo[g]||0) + 1;
   });
 
-  // só colorir grupos com 2+ pessoas
   const gruposValidos = Object.keys(contagemGrupo).filter(g => contagemGrupo[g] > 1);
   const corDoGrupo = {};
   gruposValidos.sort().forEach((g, i) => corDoGrupo[g] = i % PALETTE.length);
@@ -630,24 +1162,21 @@ function gerarTabela() {
   const iTrecho  = +document.getElementById('col-trecho').value;
   const iDoc     = +document.getElementById('col-documento').value;
   const iNumDoc  = +document.getElementById('col-numdoc').value;
-  const iEmail   = +document.getElementById('col-email').value; // -1 se não usar
+  const iEmail   = +document.getElementById('col-email').value;
 
   const ordenado = [...dadosTabela].sort((a,b) => String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
   const { reservaParaGrupo, corDoGrupo, contagemGrupo } = resolverGruposCor(ordenado, iReserva, iEmail);
 
-  // para estatísticas
   const reservasUnicas = new Set(dadosTabela.map(r => String(r[iReserva]||'').trim())).size;
   const gruposComMais  = Object.values(contagemGrupo).filter(v => v > 1).length;
   const gruposSozinhos = Object.values(contagemGrupo).filter(v => v === 1).length;
 
-  // salva mapa global para o PDF usar
   window._grupoInfo = { reservaParaGrupo, corDoGrupo, contagemGrupo, iEmail };
 
   const colHeaders = iEmail >= 0
     ? ['Nome','Reserva','Trecho','E-mail','Documento']
     : ['Nome','Reserva','Trecho','Documento'];
 
-  // Adiciona coluna "Ação" no cabeçalho
   document.getElementById('table-head').innerHTML =
     `<tr>${colHeaders.map(n=>`<th>${n}</th>`).join('')}<th style="width:50px;"></th></tr>`;
 
@@ -664,7 +1193,6 @@ function gerarTabela() {
     const cells   = iEmail >= 0
       ? [row[iNome], res, row[iTrecho], emailVal, docComb]
       : [row[iNome], res, row[iTrecho], docComb];
-    // índice real na dadosTabela para poder remover
     const idxOriginal = dadosTabela.indexOf(row);
     return `<tr data-idx="${idxOriginal}" style="background:${bg}; border-bottom:1px solid #F0F0F0; transition:opacity 0.2s;">
       ${cells.map(v=>`<td style="padding:9px 16px;color:${color};font-size:13px;">${v||''}</td>`).join('')}
@@ -680,7 +1208,6 @@ function gerarTabela() {
   document.getElementById('export-title').textContent = nomeArquivo;
   document.getElementById('export-subtitle').textContent = `${dadosTabela.length} passageiros · ${gruposComMais} grupos identificados · ${hoje}`;
 
-  // legenda por grupo
   const gruposLegenda = Object.entries(corDoGrupo).sort((a,b)=>+a[0]-+b[0]);
   const reservaPorGrupo = {};
   Object.entries(reservaParaGrupo).forEach(([res, g]) => {
@@ -701,7 +1228,7 @@ function gerarTabela() {
   document.getElementById('legend').classList[gruposComMais > 0 ? 'remove' : 'add']('hidden');
 }
 
-let removidos = []; // { row, idx, nome }
+let removidos = [];
 
 function removerPassageiro(idxOriginal) {
   const iNome = +document.getElementById('col-nome').value;
@@ -710,7 +1237,6 @@ function removerPassageiro(idxOriginal) {
   const nome = String(row[iNome]||'Passageiro').trim();
   if(!confirm(`Remover "${nome}" da lista?\n\nEle não será incluído nas exportações.`)) return;
 
-  // Some a linha da tabela com animação
   const trEl = document.querySelector(`#table-body tr[data-idx="${idxOriginal}"]`);
   if(trEl) {
     trEl.style.transition = 'opacity 0.25s, transform 0.25s';
@@ -719,11 +1245,9 @@ function removerPassageiro(idxOriginal) {
     setTimeout(() => trEl.remove(), 260);
   }
 
-  // Guarda e remove de dadosTabela
   removidos.push({ row, idx: idxOriginal, nome });
   dadosTabela.splice(idxOriginal, 1);
 
-  // Recalcula índices nos botões restantes (re-renderiza silenciosamente)
   setTimeout(() => { gerarTabela(); atualizarBtnRestaurar(); }, 300);
   mostrarToast(`"${nome}" removido. Use "Restaurar lista" para desfazer.`, false);
 }
@@ -748,10 +1272,6 @@ function atualizarBtnRestaurar() {
   }
 }
 
-function renderizarRemovidos() {
-  atualizarBtnRestaurar();
-}
-
 function filtrarTabela(txt) {
   document.querySelectorAll('#table-body tr').forEach(r => {
     r.style.display = r.textContent.toLowerCase().includes(txt.toLowerCase()) ? '' : 'none';
@@ -761,7 +1281,6 @@ function filtrarTabela(txt) {
 function exportarPNG() {
   const btn = document.getElementById('btn-png');
   btn.disabled = true; btn.textContent = 'Gerando...';
-  // Esconde botões de remover antes de capturar
   document.querySelectorAll('#table-body td:last-child, #table-head th:last-child').forEach(el => el.style.display='none');
   html2canvas(document.getElementById('export-area'), {scale:2, useCORS:true, backgroundColor:'#fff', logging:false}).then(canvas => {
     document.querySelectorAll('#table-body td:last-child, #table-head th:last-child').forEach(el => el.style.display='');
@@ -797,7 +1316,6 @@ function exportarPDFLista() {
     const ordenado = [...dadosTabela].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
     const { reservaParaGrupo, corDoGrupo, contagemGrupo } = resolverGruposCor(ordenado, iReserva, iEmail);
 
-    // Agrupa por trecho mantendo ordem de aparição
     const porTrecho = {};
     const ordemTrecho = [];
     ordenado.forEach(row => {
@@ -821,7 +1339,6 @@ function exportarPDFLista() {
       ? { 0:220, 1:80, 2:240, 3:190, 4:'auto' }
       : { 0:260, 1:90, 2:300, 3:'auto' };
 
-    // ── Cabeçalho global (só na primeira página) ──────────────────────
     doc.setFillColor(173, 20, 87);
     doc.rect(0, 0, pageW, 46, 'F');
     doc.setTextColor(255,255,255);
@@ -832,7 +1349,6 @@ function exportarPDFLista() {
     doc.setFontSize(9);
     doc.text(hoje, pageW - margem, 31, {align:'right'});
 
-    // Faixa rosa claro com total geral
     doc.setFillColor(248, 187, 217);
     doc.rect(0, 46, pageW, 20, 'F');
     doc.setTextColor(136, 14, 79);
@@ -840,24 +1356,20 @@ function exportarPDFLista() {
     const totalGrupos = Object.values(contagemGrupo).filter(v=>v>1).length;
     doc.text(`${dadosTabela.length} passageiros  ·  ${ordemTrecho.length} trecho(s)  ·  ${totalGrupos} grupo(s) identificado(s)`, margem, 59);
 
-    let cursorY = 70; // posição Y atual no documento
+    let cursorY = 70;
 
-    // ── Itera por trecho, TUDO CONTÍNUO ───────────────────────────────
     ordemTrecho.forEach((trecho, tIdx) => {
       const linhas = porTrecho[trecho];
       const gruposNaTela = new Set(linhas.map(l => reservaParaGrupo[String(l[iReserva]||'').trim()]));
       const qtdGrupos = [...gruposNaTela].filter(g => contagemGrupo[g] > 1).length;
 
-      // Espaço mínimo para caber a barra + cabeçalho da tabela (≈50pt)
-      // Se não couber, adiciona página mas NÃO repete o cabeçalho global
       if(tIdx > 0 && cursorY + 50 > pageH - 30) {
         doc.addPage();
         cursorY = 20;
       }
 
-      // ── Barra separadora de trecho ─────────────────────────────────
       const barH = 28;
-      if(tIdx > 0) cursorY += 10; // espaço extra entre trechos
+      if(tIdx > 0) cursorY += 10;
 
       doc.setFillColor(173, 20, 87);
       doc.roundedRect(margem, cursorY, pageW - margem*2, barH, 4, 4, 'F');
@@ -869,7 +1381,6 @@ function exportarPDFLista() {
 
       cursorY += barH + 2;
 
-      // ── Tabela do trecho ───────────────────────────────────────────
       const tableRows = linhas.map(row => {
         const res     = String(row[iReserva]||'').trim();
         const tipoDoc = String(row[iDoc]||'').trim();
@@ -918,11 +1429,9 @@ function exportarPDFLista() {
           }
         },
         margin: { left: margem, right: margem },
-        // Cabeçalho da tabela só repete se passar de página dentro do mesmo trecho
         showHead: 'everyPage',
       });
 
-      // Atualiza cursor para depois da tabela
       cursorY = doc.lastAutoTable.finalY + 6;
     });
 
@@ -952,7 +1461,6 @@ async function exportarXLSX() {
     const ordenado = [...dadosTabela].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
     const { reservaParaGrupo, corDoGrupo, contagemGrupo } = resolverGruposCor(ordenado, iReserva, iEmail);
 
-    // Agrupa por trecho mantendo ordem
     const porTrecho = {};
     const ordemTrecho = [];
     ordenado.forEach(row => {
@@ -966,17 +1474,14 @@ async function exportarXLSX() {
     wb.created = new Date();
     const ws  = wb.addWorksheet('Passageiros');
 
-    const numCols = temEmail ? 5 : 4;
     const lastCol = temEmail ? 'E' : 'D';
 
-    // Larguras
     ws.columns = temEmail
       ? [{width:38},{width:12},{width:36},{width:30},{width:22}]
       : [{width:38},{width:12},{width:36},{width:22}];
 
     const toArgb = hex => 'FF' + hex.replace('#','').toUpperCase();
 
-    // Cabeçalho geral da planilha (rosa Buser)
     const hoje = new Date().toLocaleDateString('pt-BR');
     const totalGrupos = Object.values(contagemGrupo).filter(v=>v>1).length;
     const cabecalhoGeral = ws.addRow([`buser — Lista de Passageiros · ${dadosTabela.length} passageiros · ${ordemTrecho.length} trecho(s) · ${totalGrupos} grupo(s) · ${hoje}`]);
@@ -986,7 +1491,7 @@ async function exportarXLSX() {
     cabecalhoGeral.getCell(1).fill      = { type:'pattern', pattern:'solid', fgColor:{argb:'FFAD1457'} };
     cabecalhoGeral.getCell(1).alignment = { horizontal:'center', vertical:'middle' };
 
-    ws.addRow([]); // linha em branco após cabeçalho geral
+    ws.addRow([]);
 
     const headers = temEmail
       ? ['Nome','Reserva','Trecho','E-mail','Documento']
@@ -997,7 +1502,6 @@ async function exportarXLSX() {
       const gruposNaTela = new Set(linhas.map(l => reservaParaGrupo[String(l[iReserva]||'').trim()]));
       const qtdGrupos = [...gruposNaTela].filter(g => contagemGrupo[g] > 1).length;
 
-      // ── Barra separadora do trecho ──────────────────────────────
       const sepRow = ws.addRow([`${trecho}   ·   ${linhas.length} passageiro(s)   ·   ${qtdGrupos} grupo(s)`]);
       const sepRowNum = sepRow.number;
       ws.mergeCells(`A${sepRowNum}:${lastCol}${sepRowNum}`);
@@ -1006,7 +1510,6 @@ async function exportarXLSX() {
       sepRow.getCell(1).fill      = { type:'pattern', pattern:'solid', fgColor:{argb:'FFAD1457'} };
       sepRow.getCell(1).alignment = { horizontal:'left', vertical:'middle', indent:1 };
 
-      // ── Cabeçalho das colunas ───────────────────────────────────
       const hRow = ws.addRow(headers);
       hRow.height = 16;
       hRow.eachCell(cell => {
@@ -1016,7 +1519,6 @@ async function exportarXLSX() {
         cell.border    = { bottom:{ style:'thin', color:{argb:'FFFFCCDD'} } };
       });
 
-      // ── Linhas de dados ─────────────────────────────────────────
       linhas.forEach((row, idx) => {
         const res     = String(row[iReserva]||'').trim();
         const tipoDoc = String(row[iDoc]||'').trim();
@@ -1046,14 +1548,11 @@ async function exportarXLSX() {
         });
       });
 
-      // Linha em branco entre trechos (exceto no último)
       if(tIdx < ordemTrecho.length - 1) ws.addRow([]);
     });
 
-    // Congela linha 1 (cabeçalho geral)
     ws.views = [{ state:'frozen', ySplit:1 }];
 
-    // Gera e baixa
     const buffer = await wb.xlsx.writeBuffer();
     const blob   = new Blob([buffer], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
     const a = document.createElement('a');
@@ -1171,6 +1670,20 @@ function mostrarToast(msg, erro) {
   t.style.display='flex';
   setTimeout(()=>t.style.display='none', 4000);
 }
+
+// Fecha dropdown ao clicar fora
+document.addEventListener('click', e => {
+  if(!e.target.closest('.ac-wrap')) {
+    document.querySelectorAll('.ac-dropdown').forEach(d => { d.classList.remove('open'); d.innerHTML = ''; });
+  }
+});
+
+// Marca campo de endereço como editado manualmente
+document.addEventListener('input', e => {
+  if(e.target.id && e.target.id.includes('endereco')) {
+    e.target.dataset.editado = '1';
+  }
+});
 </script>
 </body>
 </html>
