@@ -491,6 +491,7 @@
         <div><label>Tipo documento (RG/CPF)</label><select id="col-documento"></select></div>
         <div><label>Número do documento</label><select id="col-numdoc"></select></div>
         <div><label>E-mail (opcional)</label><select id="col-email"><option value="-1">— não usar —</option></select></div>
+        <div><label>Telefone (opcional)</label><select id="col-fone"><option value="-1">— não usar —</option></select></div>
       </div>
       <button class="btn btn-pink" onclick="gerarTabela()">Gerar tabela agrupada</button>
     </div>
@@ -969,10 +970,10 @@ function acSelect(inputId, idx) {
   document.getElementById(inputId).value = item.label;
   document.getElementById('ac-' + inputId).classList.remove('open');
 
-  // Preenche endereço automaticamente quando seleciona cidade de DESTINO
-  if(inputId.startsWith('jira-destino')) {
+  // Preenche endereço automaticamente quando seleciona cidade de EMBARQUE (origem)
+  if(inputId.startsWith('jira-trecho')) {
     // descobre sufixo: '' para main, '-0', '-1' etc para extras
-    const sufixo = inputId.replace('jira-destino', ''); // '' ou '-0', '-1'...
+    const sufixo = inputId.replace('jira-trecho', ''); // '' ou '-0', '-1'...
     const endId  = sufixo === '' ? 'jira-endereco' : `jira-endereco${sufixo}`;
     const hintId = sufixo === '' ? 'hint-endereco-main' : `hint-endereco${sufixo}`;
     const endEl  = document.getElementById(endId);
@@ -1278,6 +1279,16 @@ function preencherSelects() {
     colunas.map(c => `<option value="${c.idx}">${c.label}</option>`).join('');
   const colEmail = colunas.find(c => c.label.toLowerCase().includes('email') || c.label.toLowerCase().includes('e-mail') || c.label.toLowerCase().includes('mail'));
   if(colEmail) selEmail.value = colEmail.idx;
+
+  // Telefone
+  const selFone = document.getElementById('col-fone');
+  selFone.innerHTML = '<option value="-1">— não usar —</option>' +
+    colunas.map(col => `<option value="${col.idx}">${col.label}</option>`).join('');
+  const colFone = colunas.find(c => {
+    const l = c.label.toLowerCase();
+    return l.includes('fone') || l.includes('telefone') || l.includes('phone') || l.includes('celular') || l.includes('whatsapp');
+  });
+  if(colFone) selFone.value = colFone.idx;
 }
 
 function resolverGruposCor(dadosOrdenados, iReserva, iEmail) {
@@ -1549,6 +1560,7 @@ function renderTabelaComDados(dados) {
   const iDoc     = +document.getElementById('col-documento').value;
   const iNumDoc  = +document.getElementById('col-numdoc').value;
   const iEmail   = +document.getElementById('col-email').value;
+  const iFone    = +document.getElementById('col-fone').value;
 
   const { reservaParaGrupo, corDoGrupo } = window._grupoInfo || {};
 
@@ -1575,8 +1587,13 @@ function renderTabelaComDados(dados) {
     const numDoc  = String(row[iNumDoc]||'').trim();
     const docComb = tipoDoc && numDoc && tipoDoc !== numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
     const emailVal = iEmail >= 0 ? (row[iEmail]||'') : null;
-    const cells   = iEmail >= 0
+    const foneVal  = iFone  >= 0 ? (row[iFone] ||'') : null;
+    const cells   = iEmail >= 0 && iFone >= 0
+      ? [row[iNome], res, row[iTrecho], emailVal, foneVal, docComb]
+      : iEmail >= 0
       ? [row[iNome], res, row[iTrecho], emailVal, docComb]
+      : iFone >= 0
+      ? [row[iNome], res, row[iTrecho], foneVal, docComb]
       : [row[iNome], res, row[iTrecho], docComb];
     const idxOriginal = dadosTabela.indexOf(row);
     return `<tr data-idx="${idxOriginal}" style="background:${bg}; border-bottom:1px solid #F0F0F0; transition:opacity 0.2s;">
@@ -1635,6 +1652,7 @@ function exportarPDFLista() {
     const iDoc     = +document.getElementById('col-documento').value;
     const iNumDoc  = +document.getElementById('col-numdoc').value;
     const iEmail   = +document.getElementById('col-email').value;
+  const iFone    = +document.getElementById('col-fone').value;
 
     const dadosExport = getDadosParaExportar();
     const ordenado = [...dadosExport].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
@@ -1657,6 +1675,7 @@ function exportarPDFLista() {
     const margem = 32;
 
     const temEmail = iEmail >= 0;
+    const temFone  = iFone  >= 0;
     const colHeaders = temEmail
       ? ['Nome','Reserva','Trecho','E-mail','Documento']
       : ['Nome','Reserva','Trecho','Documento'];
@@ -1730,6 +1749,8 @@ function exportarPDFLista() {
         const numDoc  = String(row[iNumDoc]||'').trim();
         const docComb = tipoDoc && numDoc && tipoDoc !== numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
         const emailV  = temEmail ? String(row[iEmail]||'').trim() : null;
+        const foneV   = temFone  ? String(row[iFone] ||'').trim() : null;
+        const foneV   = temFone  ? String(row[iFone] ||'').trim() : null;
         const grupoId = reservaParaGrupo[res];
         const data    = temEmail
           ? [pdfStr(row[iNome]), res, pdfStr(row[iTrecho]), pdfStr(emailV), pdfStr(docComb)]
@@ -1801,6 +1822,7 @@ async function exportarXLSX() {
     const iDoc     = +document.getElementById('col-documento').value;
     const iNumDoc  = +document.getElementById('col-numdoc').value;
     const iEmail   = +document.getElementById('col-email').value;
+  const iFone    = +document.getElementById('col-fone').value;
     const temEmail = iEmail >= 0;
 
     const ordenado = [...dadosTabela].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
