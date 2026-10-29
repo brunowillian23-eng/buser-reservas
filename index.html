@@ -2,6 +2,9 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ferramenta Interna — Buser</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23AD1457'/><text y='72' x='50' text-anchor='middle' font-size='62' font-family='sans-serif'>🚌</text></svg>">
@@ -13,20 +16,29 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <style>
   :root {
-    --pink: #AD1457;
-    --pink-dark: #880E4F;
-    --pink-light: #F8BBD9;
-    --pink-bg: #FFF0F6;
-    --gray-bg: #F7F7F8;
-    --gray-border: #E5E5E5;
-    --gray-text: #666;
-    --dark: #1A1A2E;
+    /* === Buser Andromeda Design Tokens === */
+    --pink: #f11075;
+    --pink-dark: #b00051;
+    --pink-active: #e6006a;
+    --pink-light: #ffaecc;
+    --pink-bg: #fff7fa;
+    --gray-bg: #fafafa;
+    --gray-border: #e0e0e0;
+    --gray-text: #757575;
+    --dark: #454545;
     --white: #FFFFFF;
-    --success: #1B7F3A;
-    --danger: #C62828;
+    --surface-card: #ffffff;
+    --surface-soft: #fff7fa;
+    --success: #40b552;
+    --danger: #dc2e36;
+    --shadow-card: 0 6px 60px rgba(74,63,69,0.06);
+    --shadow-el1: 0 4px 8px rgba(0,0,0,0.10);
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-full: 500px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-bg); color: var(--dark); min-height: 100vh; }
+  body { font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-bg); color: var(--dark); min-height: 100vh; }
 
   /* NAV */
   nav {
@@ -346,6 +358,55 @@
     font-size: 12px; color: var(--pink-dark); display: none;
   }
 
+  /* FILTROS EMBARQUE/DESEMBARQUE */
+  .filtros-trecho {
+    display: none;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 10px;
+  }
+  .filtros-trecho.visible { display: flex; }
+  .filtro-label {
+    font-size: 11px; font-weight: 600; color: var(--gray-text);
+    text-transform: uppercase; letter-spacing: 0.4px;
+    white-space: nowrap;
+  }
+  .filtro-select {
+    padding: 7px 30px 7px 12px;
+    border: 1px solid var(--gray-border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Poppins', sans-serif;
+    background: var(--gray-bg);
+    color: var(--dark);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23757575' stroke-width='1.5' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    min-width: 160px;
+    flex: 1;
+    max-width: 300px;
+    transition: border-color 0.15s;
+  }
+  .filtro-select:focus { outline: none; border-color: var(--pink); }
+  .filtro-select.ativo { border-color: var(--pink); background-color: var(--pink-bg); color: var(--pink-dark); }
+  .filtro-sep { width: 1px; height: 22px; background: var(--gray-border); margin: 0 4px; }
+  .btn-limpar-filtros {
+    background: none; border: 1px solid var(--gray-border);
+    border-radius: 8px; padding: 6px 12px;
+    font-size: 12px; font-weight: 600; color: var(--gray-text);
+    cursor: pointer; transition: all 0.15s; display: none;
+    font-family: 'Poppins', sans-serif;
+  }
+  .btn-limpar-filtros:hover { border-color: var(--pink); color: var(--pink); background: var(--pink-bg); }
+  .btn-limpar-filtros.visible { display: inline-flex; align-items: center; gap: 5px; }
+
 
 </style>
 </head>
@@ -439,6 +500,21 @@
       <div class="stat-card"><div class="lbl">Reservas únicas</div><div class="val" id="stat-reservas">—</div></div>
       <div class="stat-card"><div class="lbl">Grupos (2+)</div><div class="val" id="stat-grupos">—</div></div>
       <div class="stat-card"><div class="lbl">Sozinhos</div><div class="val" id="stat-solo">—</div></div>
+    </div>
+
+    <div class="filtros-trecho" id="filtros-trecho-bar">
+      <span class="filtro-label">🚌 Embarque</span>
+      <select class="filtro-select" id="filtro-embarque" onchange="aplicarFiltrosTrecho()">
+        <option value="">Todos</option>
+      </select>
+      <div class="filtro-sep"></div>
+      <span class="filtro-label">🏁 Desembarque</span>
+      <select class="filtro-select" id="filtro-desembarque" onchange="aplicarFiltrosTrecho()">
+        <option value="">Todos</option>
+      </select>
+      <button class="btn-limpar-filtros" id="btn-limpar-filtros" onclick="limparFiltrosTrecho()">
+        ✕ Limpar filtros
+      </button>
     </div>
 
     <div class="actions-bar hidden" id="actions-section">
@@ -765,10 +841,12 @@ const DB_EMPRESAS = [
 ];
 
 const DB_RODOVIARIAS = {
-  'São Paulo-SP':        { end: 'Praça Júlio Prestes, s/n - Luz, São Paulo - SP, 01218-020' },
-  'Rio de Janeiro-RJ':   { end: 'Av. Francisco Bicalho, 1 - Santo Cristo, Rio de Janeiro - RJ, 20220-310' },
-  'Belo Horizonte-MG':   { end: 'Praça Rio Branco, 100 - Centro, Belo Horizonte - MG, 30110-002' },
-  'Campinas-SP':         { end: 'R. Dr. Campos Sales, 101 - Centro, Campinas - SP, 13010-040' },
+  'São Paulo-SP':          { end: 'Av. Cruzeiro do Sul, 1800 - Santana, São Paulo - SP (Tietê)' },
+  'São Paulo - Tietê':     { end: 'Av. Cruzeiro do Sul, 1800 - Santana, São Paulo - SP' },
+  'São Paulo - Barra Funda': { end: 'Rua Mário de Andrade, 664 - Barra Funda, São Paulo - SP' },
+  'Rio de Janeiro-RJ':   { end: 'Av. Francisco Bicalho, 1 - Santo Cristo, Rio de Janeiro - RJ' },
+  'Belo Horizonte-MG':   { end: 'Praça Rio Branco, 100 - Centro, Belo Horizonte - MG' },
+  'Campinas-SP':         { end: 'Rua Dr. Pereira Lima, 85 - Vila Industrial, Campinas - SP' },
   'Curitiba-PR':         { end: 'Av. Afonso Camargo, 330 - Jardim Botânico, Curitiba - PR, 80060-090' },
   'Porto Alegre-RS':     { end: 'Largo Vespasiano Julio Veppo, 10 - Floresta, Porto Alegre - RS, 90220-270' },
   'Salvador-BA':         { end: 'Av. Antônio Carlos Magalhães, s/n - Iguatemi, Salvador - BA, 41825-000' },
@@ -777,31 +855,42 @@ const DB_RODOVIARIAS = {
   'Brasília-DF':         { end: 'ST de Clubes Esportivos Sul Trecho 2, Conjunto 22 - Asa Sul, Brasília - DF, 70322-915' },
   'Goiânia-GO':          { end: 'R. 44, 399 - Vila Nova, Goiânia - GO, 74645-080' },
   'Florianópolis-SC':    { end: 'R. Antônio Edu Vieira, 1490 - Pantanal, Florianópolis - SC, 88040-001' },
-  'Vitória-ES':          { end: 'Av. Jerônimo Monteiro, 101 - Centro, Vitória - ES, 29010-002' },
+  'Vitória-ES':          { end: 'Av. Alexandre Buaiz, 350 - Ilha do Príncipe, Vitória - ES' },
   'Uberlândia-MG':       { end: 'Av. João Naves de Ávila, 657 - Brasil, Uberlândia - MG, 38400-398' },
-  'Ribeirão Preto-SP':   { end: 'R. Dr. Celso Charuri, 90 - Vila Tibério, Ribeirão Preto - SP, 14050-060' },
+  'Ribeirão Preto-SP':   { end: 'Av. Jerônimo Gonçalves, 640 - Centro, Ribeirão Preto - SP' },
   'Londrina-PR':         { end: 'Av. Dom Pedro II, 98 - Centro, Londrina - PR, 86010-150' },
   'Joinville-SC':        { end: 'R. Paraíba, 260 - Anita Garibaldi, Joinville - SC, 89203-015' },
   'Juiz de Fora-MG':     { end: 'Av. Brasil, 4001 - Barreira do Triunfo, Juiz de Fora - MG, 36092-020' },
   'Montes Claros-MG':    { end: 'Av. Dr. Carlos Versiani Gomes, 699 - Augusta Mota, Montes Claros - MG, 39401-115' },
-  'Diamantina-MG':       { end: 'Av. Silvio Felício dos Santos, s/n - Mercês, Diamantina - MG, 39100-000' },
+  'Diamantina-MG':       { end: 'Largo Dom João, 134 - Centro, Diamantina - MG' },
   'Sete Lagoas-MG':      { end: 'Av. Prefeito Alberto Moura, 7001 - Eldorado, Sete Lagoas - MG, 35700-388' },
   'Santos-SP':           { end: 'Praça dos Andradas, s/n - Centro, Santos - SP, 11010-905' },
   'Maceió-AL':           { end: 'R. Dr. Aristides Maltez, s/n - Fernão Velho, Maceió - AL, 57030-020' },
   'Natal-RN':            { end: 'Av. Capitão Mor Gouveia, 1237 - Cidade da Esperança, Natal - RN, 59071-010' },
   'Feira de Santana-BA': { end: 'R. Senhor dos Passos, s/n - Centro, Feira de Santana - BA, 44001-090' },
   'Caruaru-PE':          { end: 'Av. José Rufino, s/n - Indianópolis, Caruaru - PE, 55014-260' },
-  'Caraguatatuba-SP':    { end: 'R. São João, 120 - Poiares, Caraguatatuba - SP, 11660-300' },
+  'Caraguatatuba-SP':    { end: 'Av. Brasília, s/n - Indaiá, Caraguatatuba - SP' },
   'Guarulhos-SP':        { end: 'Av. Brigadeiro Faria Lima, 3565 - Jardim Munhoz, Guarulhos - SP, 07016-100' },
-  'Bauru-SP':            { end: 'Praça Dr. Sidélio Munia, 1 - Centro, Bauru - SP, 17010-230' },
+  'Bauru-SP':            { end: 'Praça João Paulo II, 30 - Centro, Bauru - SP' },
   'Barbacena-MG':        { end: 'Av. Bias Fortes, 100 - Floresta, Barbacena - MG, 36202-020' },
-  'Governador Valadares-MG': { end: 'Av. Minas Gerais, 51 - Centro, Gov. Valadares - MG, 35010-170' },
+  'Governador Valadares-MG': { end: 'Rua Marechal Floriano, 1057 - Centro, Governador Valadares - MG' },
   'Conselheiro Lafaiete-MG': { end: 'Rua Rodovias Federais, s/n - São Caetano, Conselheiro Lafaiete - MG, 36400-000' },
-  'Curvelo-MG':          { end: 'Av. Getúlio Vargas, 800 - Centro, Curvelo - MG, 35790-000' },
+  'Curvelo-MG':          { end: 'Praça Tancredo Neves, 35 - Tibira, Curvelo - MG' },
   'Campo Grande-MS':     { end: 'R. Joaquim Nabuco, 200 - Monte Castelo, Campo Grande - MS, 79010-100' },
   'Belém-PA':            { end: 'Av. Almirante Barroso, 3565 - Marco, Belém - PA, 66093-020' },
   'Manaus-AM':           { end: 'R. Recife, s/n - Flores, Manaus - AM, 69058-030' },
-  'Campina Grande-PB':   { end: 'Av. Sen. Argemiro de Figueiredo, s/n - Itararé, Campina Grande - PB, 58411-020' },
+  'Campina Grande-PB':   { end: 'Av. Sen. Argemiro de Figueiredo, s/n - Itararé, Campina Grande - PB' },
+  'São José dos Campos-SP': { end: 'Rua Itororó, 221 - Vila Piratininga, São José dos Campos - SP' },
+  'Ipatinga-MG':           { end: 'Av. João Valentim Pascoal, 637 - Centro, Ipatinga - MG' },
+  'Vila Velha-ES':         { end: 'Rodovia Darly Santos, 5153 - Jockey de Itaparica, Vila Velha - ES' },
+  'Ubatuba-SP':            { end: 'Rua Prof. Thomaz Galhardo, 513 - Centro, Ubatuba - SP' },
+  'Jales-SP':              { end: 'Rua Três, 1278 - Jardim Elizabeth, Jales - SP' },
+  'Votuporanga-SP':        { end: 'Rua João Vilar Pontes, 25 - 1º Distrito Industrial, Votuporanga - SP' },
+  'Americana-SP':          { end: 'Rua Ítalo Boscheiro, 220 - Campo Limpo, Americana - SP' },
+  'Barretos-SP':           { end: 'Rua 32, 355 - Fortaleza, Barretos - SP' },
+  'Araraquara-SP':         { end: 'Av. Júlio Ursulino Pedroso, 100 - Jardim Nova América, Araraquara - SP' },
+  'Viçosa-MG':             { end: 'Av. Mal. Humberto Castelo Branco, 106 - Centro, Viçosa - MG' },
+  'Ubá-MG':               { end: 'Av. Comendador Jacinto Soares de Souza Lima, s/n - Centro, Ubá - MG' },
 };
 
 // ===== AUTOCOMPLETE ENGINE =====
@@ -1308,6 +1397,10 @@ function gerarTabela() {
 
   ['stats-section','actions-section','export-area'].forEach(id => document.getElementById(id).classList.remove('hidden'));
   document.getElementById('legend').classList[gruposComMais > 0 ? 'remove' : 'add']('hidden');
+
+  // Inicializar filtros de trecho
+  dadosFiltrados = [...dadosTabela];
+  popularFiltrosTrecho();
 }
 
 let removidos = []; // { row, idx, nome }
@@ -1361,6 +1454,142 @@ function renderizarRemovidos() {
   atualizarBtnRestaurar();
 }
 
+// ===== FILTROS EMBARQUE / DESEMBARQUE =====
+let dadosFiltrados = []; // subconjunto dos dadosTabela após filtros de trecho
+
+function popularFiltrosTrecho() {
+  const iTrecho = +document.getElementById('col-trecho').value;
+  const embarqueSet  = new Set();
+  const desembarqueSet = new Set();
+
+  dadosTabela.forEach(row => {
+    const trecho = String(row[iTrecho]||'').trim();
+    // Formato esperado: "Cidade A-UF → Cidade B-UF" ou "Cidade A-UF !' Cidade B-UF"
+    const partes = trecho.split(/→|!'/).map(p => p.trim()).filter(Boolean);
+    if(partes.length >= 2) {
+      embarqueSet.add(partes[0]);
+      desembarqueSet.add(partes[partes.length - 1]);
+    } else if(partes.length === 1) {
+      embarqueSet.add(partes[0]);
+    }
+  });
+
+  const embarqueSelect    = document.getElementById('filtro-embarque');
+  const desembarqueSelect = document.getElementById('filtro-desembarque');
+
+  // Preencher embarque
+  const embarques = [...embarqueSet].sort();
+  embarqueSelect.innerHTML = '<option value="">Todos os embarques</option>' +
+    embarques.map(c => `<option value="${c}">${c}</option>`).join('');
+
+  // Preencher desembarque
+  const desembarques = [...desembarqueSet].sort();
+  desembarqueSelect.innerHTML = '<option value="">Todos os desembarques</option>' +
+    desembarques.map(c => `<option value="${c}">${c}</option>`).join('');
+
+  // Mostrar barra de filtros
+  const bar = document.getElementById('filtros-trecho-bar');
+  if(embarques.length > 0 || desembarques.length > 0) bar.classList.add('visible');
+}
+
+function aplicarFiltrosTrecho() {
+  const iTrecho = +document.getElementById('col-trecho').value;
+  const embFiltro = document.getElementById('filtro-embarque').value;
+  const desFiltro = document.getElementById('filtro-desembarque').value;
+
+  // Atualizar visual dos selects
+  document.getElementById('filtro-embarque').classList.toggle('ativo', !!embFiltro);
+  document.getElementById('filtro-desembarque').classList.toggle('ativo', !!desFiltro);
+
+  // Botão limpar
+  const btnLimpar = document.getElementById('btn-limpar-filtros');
+  btnLimpar.classList.toggle('visible', !!(embFiltro || desFiltro));
+
+  // Filtrar dadosTabela
+  dadosFiltrados = dadosTabela.filter(row => {
+    const trecho = String(row[iTrecho]||'').trim();
+    const partes = trecho.split(/→|!'/).map(p => p.trim()).filter(Boolean);
+    const embarque    = partes[0] || '';
+    const desembarque = partes.length >= 2 ? partes[partes.length - 1] : '';
+
+    if(embFiltro && !embarque.toLowerCase().includes(embFiltro.toLowerCase())) return false;
+    if(desFiltro && !desembarque.toLowerCase().includes(desFiltro.toLowerCase())) return false;
+    return true;
+  });
+
+  // Rederizar tabela com dados filtrados
+  renderTabelaComDados(dadosFiltrados);
+}
+
+function limparFiltrosTrecho() {
+  document.getElementById('filtro-embarque').value = '';
+  document.getElementById('filtro-desembarque').value = '';
+  document.getElementById('filtro-embarque').classList.remove('ativo');
+  document.getElementById('filtro-desembarque').classList.remove('ativo');
+  document.getElementById('btn-limpar-filtros').classList.remove('visible');
+  dadosFiltrados = [...dadosTabela];
+  renderTabelaComDados(dadosFiltrados);
+}
+
+function getDadosParaExportar() {
+  // Retorna dados filtrados se houver filtro ativo, senão todos
+  const embFiltro = document.getElementById('filtro-embarque').value;
+  const desFiltro = document.getElementById('filtro-desembarque').value;
+  if((embFiltro || desFiltro) && dadosFiltrados.length > 0) {
+    return dadosFiltrados;
+  }
+  return dadosTabela;
+}
+
+// Renderiza tabela com um conjunto de dados (pode ser filtrado ou completo)
+function renderTabelaComDados(dados) {
+  const iNome    = +document.getElementById('col-nome').value;
+  const iReserva = +document.getElementById('col-reserva').value;
+  const iTrecho  = +document.getElementById('col-trecho').value;
+  const iDoc     = +document.getElementById('col-documento').value;
+  const iNumDoc  = +document.getElementById('col-numdoc').value;
+  const iEmail   = +document.getElementById('col-email').value;
+
+  const { reservaParaGrupo, corDoGrupo } = window._grupoInfo || {};
+
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  const embFiltro = document.getElementById('filtro-embarque').value;
+  const desFiltro = document.getElementById('filtro-desembarque').value;
+  let subtitle = `${dados.length} passageiro(s)`;
+  if(embFiltro || desFiltro) {
+    subtitle += ` · filtrado: ${embFiltro||'todos'} → ${desFiltro||'todos'}`;
+  }
+  subtitle += ` · ${hoje}`;
+  document.getElementById('export-subtitle').textContent = subtitle;
+  document.getElementById('stat-passageiros').textContent = dados.length;
+
+  const ordenado = [...dados].sort((a,b) => String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
+
+  document.getElementById('table-body').innerHTML = ordenado.map((row, idx) => {
+    const res     = String(row[iReserva]||'').trim();
+    const grupoId = reservaParaGrupo ? reservaParaGrupo[res] : undefined;
+    const ci      = (corDoGrupo && grupoId !== undefined) ? corDoGrupo[grupoId] : undefined;
+    const bg      = ci !== undefined ? PALETTE[ci] : (idx%2===0?'#fff':'#FAFAFA');
+    const color   = ci !== undefined ? PALETTE_TEXT[ci] : '#333';
+    const tipoDoc = String(row[iDoc]||'').trim();
+    const numDoc  = String(row[iNumDoc]||'').trim();
+    const docComb = tipoDoc && numDoc && tipoDoc !== numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
+    const emailVal = iEmail >= 0 ? (row[iEmail]||'') : null;
+    const cells   = iEmail >= 0
+      ? [row[iNome], res, row[iTrecho], emailVal, docComb]
+      : [row[iNome], res, row[iTrecho], docComb];
+    const idxOriginal = dadosTabela.indexOf(row);
+    return `<tr data-idx="${idxOriginal}" style="background:${bg}; border-bottom:1px solid #F0F0F0; transition:opacity 0.2s;">
+      ${cells.map(v=>`<td style="padding:9px 16px;color:${color};font-size:13px;">${v||''}</td>`).join('')}
+      <td style="padding:6px 10px; text-align:center;">
+        <button onclick="removerPassageiro(${idxOriginal})" title="Remover passageiro da lista"
+          style="background:none;border:1px solid #ffcccc;border-radius:6px;padding:3px 8px;cursor:pointer;color:#c0392b;font-size:12px;font-weight:600;transition:all 0.15s;"
+          onmouseover="this.style.background='#fff0f0'" onmouseout="this.style.background='none'">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
 function filtrarTabela(txt) {
   document.querySelectorAll('#table-body tr').forEach(r => {
     r.style.display = r.textContent.toLowerCase().includes(txt.toLowerCase()) ? '' : 'none';
@@ -1407,7 +1636,8 @@ function exportarPDFLista() {
     const iNumDoc  = +document.getElementById('col-numdoc').value;
     const iEmail   = +document.getElementById('col-email').value;
 
-    const ordenado = [...dadosTabela].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
+    const dadosExport = getDadosParaExportar();
+    const ordenado = [...dadosExport].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
     const { reservaParaGrupo, corDoGrupo, contagemGrupo } = resolverGruposCor(ordenado, iReserva, iEmail);
 
     // Agrupa por trecho mantendo ordem de aparição
@@ -1451,7 +1681,7 @@ function exportarPDFLista() {
     doc.setTextColor(136, 14, 79);
     doc.setFontSize(9); doc.setFont('helvetica','bold');
     const totalGrupos = Object.values(contagemGrupo).filter(v=>v>1).length;
-    doc.text(`${dadosTabela.length} passageiros  ·  ${ordemTrecho.length} trecho(s)  ·  ${totalGrupos} grupo(s) identificado(s)`, margem, 59);
+    doc.text(`${dadosExport.length} passageiros  ·  ${ordemTrecho.length} trecho(s)  ·  ${totalGrupos} grupo(s) identificado(s)`, margem, 59);
 
     let cursorY = 70; // posição Y atual no documento
 
@@ -1603,7 +1833,7 @@ async function exportarXLSX() {
     // Cabeçalho geral da planilha (rosa Buser)
     const hoje = new Date().toLocaleDateString('pt-BR');
     const totalGrupos = Object.values(contagemGrupo).filter(v=>v>1).length;
-    const cabecalhoGeral = ws.addRow([`buser — Lista de Passageiros · ${dadosTabela.length} passageiros · ${ordemTrecho.length} trecho(s) · ${totalGrupos} grupo(s) · ${hoje}`]);
+    const cabecalhoGeral = ws.addRow([`buser — Lista de Passageiros · ${dadosExport.length} passageiros · ${ordemTrecho.length} trecho(s) · ${totalGrupos} grupo(s) · ${hoje}`]);
     ws.mergeCells(`A1:${lastCol}1`);
     cabecalhoGeral.height = 26;
     cabecalhoGeral.getCell(1).font      = { bold:true, color:{argb:'FFFFFFFF'}, size:12 };
