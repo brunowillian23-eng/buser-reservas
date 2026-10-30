@@ -1750,10 +1750,13 @@ function exportarPDFLista() {
         const docComb = tipoDoc && numDoc && tipoDoc !== numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
         const emailV  = temEmail ? String(row[iEmail]||'').trim() : null;
         const foneV   = temFone  ? String(row[iFone] ||'').trim() : null;
-        const foneV   = temFone  ? String(row[iFone] ||'').trim() : null;
         const grupoId = reservaParaGrupo[res];
-        const data    = temEmail
-          ? [pdfStr(row[iNome]), res, pdfStr(row[iTrecho]), pdfStr(emailV), pdfStr(docComb)]
+        const data    = temEmail && temFone
+          ? [pdfStr(row[iNome]), res, pdfStr(row[iTrecho]), pdfStr(emailV||''), pdfStr(foneV||''), pdfStr(docComb)]
+          : temEmail
+          ? [pdfStr(row[iNome]), res, pdfStr(row[iTrecho]), pdfStr(emailV||''), pdfStr(docComb)]
+          : temFone
+          ? [pdfStr(row[iNome]), res, pdfStr(row[iTrecho]), pdfStr(foneV||''), pdfStr(docComb)]
           : [pdfStr(row[iNome]), res, pdfStr(row[iTrecho]), pdfStr(docComb)];
         return { data, grupoId };
       });
@@ -1899,8 +1902,13 @@ async function exportarXLSX() {
         const numDoc  = String(row[iNumDoc]||'').trim();
         const docComb = tipoDoc && numDoc && tipoDoc!==numDoc ? `${tipoDoc} · ${numDoc}` : (numDoc||tipoDoc||'');
         const emailV  = temEmail ? String(row[iEmail]||'').trim() : null;
-        const valores = temEmail
+        const foneV   = temFone  ? String(row[iFone] ||'').trim() : null;
+        const valores = temEmail && temFone
+          ? [row[iNome]||'', res, row[iTrecho]||'', emailV||'', foneV||'', docComb]
+          : temEmail
           ? [row[iNome]||'', res, row[iTrecho]||'', emailV||'', docComb]
+          : temFone
+          ? [row[iNome]||'', res, row[iTrecho]||'', foneV||'', docComb]
           : [row[iNome]||'', res, row[iTrecho]||'', docComb];
 
         const dataRow = ws.addRow(valores);
