@@ -2083,10 +2083,12 @@ async function exportarXLSX() {
     const iDoc     = +document.getElementById('col-documento').value;
     const iNumDoc  = +document.getElementById('col-numdoc').value;
     const iEmail   = +document.getElementById('col-email').value;
-  const iFone    = +document.getElementById('col-fone').value;
+    const iFone    = +document.getElementById('col-fone').value;
     const temEmail = iEmail >= 0;
+    const temFone  = iFone  >= 0;
 
-    const ordenado = [...dadosTabela].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
+    const dadosExport = getDadosParaExportar();
+    const ordenado = [...dadosExport].sort((a,b)=>String(a[iReserva]||'').localeCompare(String(b[iReserva]||'')));
     const { reservaParaGrupo, corDoGrupo, contagemGrupo } = resolverGruposCor(ordenado, iReserva, iEmail);
 
     // Agrupa por trecho mantendo ordem
@@ -2103,13 +2105,19 @@ async function exportarXLSX() {
     wb.created = new Date();
     const ws  = wb.addWorksheet('Passageiros');
 
-    const numCols = temEmail ? 5 : 4;
-    const lastCol = temEmail ? 'E' : 'D';
+    const numCols = temEmail && temFone ? 6 : (temEmail || temFone) ? 5 : 4;
+    const lastColMap = {4:'D', 5:'E', 6:'F'};
+    const lastCol = lastColMap[numCols];
 
     // Larguras
-    ws.columns = temEmail
-      ? [{width:38},{width:12},{width:36},{width:30},{width:22}]
-      : [{width:38},{width:12},{width:36},{width:22}];
+    if (temEmail && temFone)
+      ws.columns = [{width:38},{width:12},{width:36},{width:30},{width:18},{width:22}];
+    else if (temEmail)
+      ws.columns = [{width:38},{width:12},{width:36},{width:30},{width:22}];
+    else if (temFone)
+      ws.columns = [{width:38},{width:12},{width:36},{width:18},{width:22}];
+    else
+      ws.columns = [{width:38},{width:12},{width:36},{width:22}];
 
     const toArgb = hex => 'FF' + hex.replace('#','').toUpperCase();
 
@@ -2120,13 +2128,17 @@ async function exportarXLSX() {
     ws.mergeCells(`A1:${lastCol}1`);
     cabecalhoGeral.height = 26;
     cabecalhoGeral.getCell(1).font      = { bold:true, color:{argb:'FFFFFFFF'}, size:12 };
-    cabecalhoGeral.getCell(1).fill      = { type:'pattern', pattern:'solid', fgColor:{argb:'FFAD1457'} };
+    cabecalhoGeral.getCell(1).fill      = { type:'pattern', pattern:'solid', fgColor:{argb:'FFF11075'} };
     cabecalhoGeral.getCell(1).alignment = { horizontal:'center', vertical:'middle' };
 
     ws.addRow([]); // linha em branco após cabeçalho geral
 
-    const headers = temEmail
+    const headers = temEmail && temFone
+      ? ['Nome','Reserva','Trecho','E-mail','Telefone','Documento']
+      : temEmail
       ? ['Nome','Reserva','Trecho','E-mail','Documento']
+      : temFone
+      ? ['Nome','Reserva','Trecho','Telefone','Documento']
       : ['Nome','Reserva','Trecho','Documento'];
 
     ordemTrecho.forEach((trecho, tIdx) => {
@@ -2140,7 +2152,7 @@ async function exportarXLSX() {
       ws.mergeCells(`A${sepRowNum}:${lastCol}${sepRowNum}`);
       sepRow.height = 22;
       sepRow.getCell(1).font      = { bold:true, color:{argb:'FFFFFFFF'}, size:10 };
-      sepRow.getCell(1).fill      = { type:'pattern', pattern:'solid', fgColor:{argb:'FFAD1457'} };
+      sepRow.getCell(1).fill      = { type:'pattern', pattern:'solid', fgColor:{argb:'FFF11075'} };
       sepRow.getCell(1).alignment = { horizontal:'left', vertical:'middle', indent:1 };
 
       // ── Cabeçalho das colunas ───────────────────────────────────
